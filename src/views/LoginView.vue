@@ -18,6 +18,7 @@
                 <button
                     class="form-button w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-che hover:bg-red-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Login</button>
             </form>
+
         </div>
     </div>
 </template>
@@ -34,6 +35,9 @@ export default {
     computed: {
         isUserLoggedIn() {
             return this.$store.state.userLoggedIn;
+        },
+        userRole() {
+            return this.$store.state.userRole;
         }
     },
     methods: {
@@ -42,7 +46,13 @@ export default {
                 await this.$store.dispatch("login", { email: this.email, password: this.password });
                 if (this.isUserLoggedIn) {
                     this.$toast.success("Authentication succeeded.", { position: "bottom-left", duration: 1000 });
-                    await this.$router.push("/");
+                    if (this.userRole === "admin") {
+                        await this.$router.push("/admin");
+                    } else if (this.userRole === "marketing") {
+                        await this.$router.push("/marketing");
+                    } else {
+                        await this.$router.push("/login");
+                    }
                 }
             } catch (err) {
                 console.log(err);

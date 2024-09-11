@@ -1,19 +1,24 @@
 import { createRouter, createWebHistory } from "vue-router";
 import HomeView from "@/views/HouseMap.vue";
 import adminDashboard from "@/views/adminDashboard.vue";
-import store from "@/services/store";
 import LoginView from "@/views/LoginView.vue";
 import RegisterView from "@/views/RegisterView.vue";
+import UnauthorizedView from "@/views/UnauthorizedView.vue";
+import store from "@/services/store";
 
 const routes = [
   {
     path: "/",
-    name: "home",
+    redirect: { name: "Login" },
+  },
+  {
+    path: "/Marketing",
+    name: "Marketing",
     component: HomeView,
     meta: {
-      title: "Home",
+      title: "Marketing",
       authRequired: true,
-      authForbidden: false,
+      role: "marketing",
     },
   },
   {
@@ -23,7 +28,7 @@ const routes = [
     meta: {
       title: "Admin",
       authRequired: true,
-      authForbidden: false,
+      role: "admin",
     },
   },
   {
@@ -33,7 +38,6 @@ const routes = [
     meta: {
       title: "Login",
       authRequired: false,
-      authForbidden: false,
     },
   },
   {
@@ -43,7 +47,14 @@ const routes = [
     meta: {
       title: "Register",
       authRequired: false,
-      authForbidden: false,
+    },
+  },
+  {
+    path: "/unauthorized",
+    name: "Unauthorized",
+    component: UnauthorizedView,
+    meta: {
+      title: "Unauthorized",
     },
   },
 ];
@@ -59,10 +70,15 @@ router.beforeEach(async (to, from, next) => {
   }
 
   const isAuthenticated = store.state.userLoggedIn;
-  if (!isAuthenticated && to.meta.authRequired) {
-    next({ name: "login" });
-  } else if (isAuthenticated && to.meta.authForbidden) {
-    next({ name: "user" });
+  const userRole = store.state.userRole;
+  if (to.meta.authRequired && !isAuthenticated) {
+    next({ name: "Login" });
+  } else if (
+    to.meta.authRequired &&
+    to.meta.role &&
+    to.meta.role !== userRole
+  ) {
+    next({ name: "Unauthorized" });
   } else {
     next();
   }
@@ -73,8 +89,3 @@ router.afterEach((to) => {
 });
 
 export default router;
-
-// const router = createRouter({
-//   history: createWebHistory(process.env.BASE_URL),
-//   routes,
-// });

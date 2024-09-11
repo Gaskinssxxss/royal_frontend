@@ -36,7 +36,18 @@ export default {
   updateHouseStatus(id) {
     return Api.put(`/update-house-status/${id}`, { status_rumah: false });
   },
+  deupdateHouseStatus(id) {
+    return Api.put(`/deupdate-house-status/${id}`, { status_rumah: true });
+  },
   delete(id) {
     return Api.delete(`/customer/delete/${id}`);
+  },
+  searchCustomerByBlokname(blokname) {
+    return Api.get(`/search-customer`, {
+      params: { blokname: blokname },
+    });
+  },
+  getUserHistory() {
+    return Api.get("/user/history");
   },
 };
