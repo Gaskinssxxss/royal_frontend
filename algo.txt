@@ -1,0 +1,14 @@
+kondisi = deterjual 
+=> data lengkap customer
+
+kondisi = kpr 
+=> data (data yang kurang lengkap ( deterjual )) { put admin || marketing }
+
+kondisi terjual
+=> terjual
+
+kondisi cash 
+=> === terjual
+
+kondisi terbooking
+=> cancel || lengkapi data ( => terjual || kpr || cash )

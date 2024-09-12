@@ -50,57 +50,8 @@
             </tr>
           </tbody>
         </table>
-
-        <!-- Modal Ticket -->
-        <div v-if="isTicketModalVisible"
-          class="fixed inset-0 flex items-center justify-center z-30 bg-black bg-opacity-50">
-          <div class="bg-white p-6 rounded-lg shadow-lg w-96">
-            <h2 class="text-lg font-semibold mb-4">Buat Tiket untuk {{ selectedCustomer.data_pribadi[0].namaLengkap }}
-            </h2>
-            <form @submit.prevent="submitTicket">
-              <div class="mb-4">
-                <label class="block text-sm font-medium mb-1">Isi Tiket</label>
-                <textarea v-model="ticketContent" class="w-full p-2 border border-gray-300 rounded-lg"
-                  placeholder="Masukkan isi tiket"></textarea>
-              </div>
-              <div class="flex justify-end space-x-4">
-                <button @click="closeTicketModal" type="button"
-                  class="px-4 py-2 bg-gray-500 text-white rounded-lg">Batal</button>
-                <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg">Kirim</button>
-              </div>
-            </form>
-          </div>
-        </div>
-        <!-- <table v-if="show" class="table-auto w-full border-2 border-black font-anton bg-gray-200">
-          <thead>
-            <tr class="bg-gray-200 text-left">
-              <th class="px-4 py-2 border-2 border-black font-normal">Blok</th>
-              <th class="px-4 py-2 border-2 border-black font-normal">No Rumah</th>
-              <th class="px-4 py-2 border-2 border-black font-normal">Status Verifikasi</th>
-              <th class="px-4 py-2 border-2 border-black font-normal">No Kavling</th>
-              <th class="px-4 py-2 border-2 border-black font-normal">Type Kavling</th>
-              <th class="px-4 py-2 border-2 border-black font-normal">Luas Bangunan</th>
-              <th class="px-4 py-2 border-2 border-black font-normal">Luas Tanah</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="customer in userHistory" :key="customer._id" class="border-b">
-              <td class="px-4 py-2 border-2 border-black">{{ customer.id_blok.blokname }}</td>
-              <td class="px-4 py-2 border-2 border-black">{{ customer.id_rumah.no_rumah }}</td>
-              <div v-if="customer.verifikasi_data === true" class="border-b-2 border-black">
-                <td class="px-4 py-2">Terverifikasi</td>
-              </div>
-              <div v-else-if="customer.verifikasi_data === false" class="border-b-2 border-black">
-                <td class="px-4 py-2">Belum Terverifikasi</td>
-              </div>
-              <td class="px-4 py-2 border-2 border-black">{{ customer.kavling[0].no_kavling }}</td>
-              <td class="px-4 py-2 border-2 border-black">{{ customer.kavling[0].type }}</td>
-              <td class="px-4 py-2 border-2 border-black">{{ customer.kavling[0].luas_bangunan }}</td>
-              <td class="px-4 py-2 border-2 border-black">{{ customer.kavling[0].luas_tanah }}</td>
-            </tr>
-          </tbody>
-        </table> -->
       </div>
+
       <div v-else-if="userHistory.length < 2">
         <table v-if="show" class="table-auto w-full border-2 border-black font-anton text-xl">
           <thead>
@@ -112,6 +63,7 @@
               <th class="px-4 py-2 border-2 border-black font-normal">Type Kavling</th>
               <th class="px-4 py-2 border-2 border-black font-normal">Luas Bangunan</th>
               <th class="px-4 py-2 border-2 border-black font-normal">Luas Tanah</th>
+              <th class="px-4 py-2 border-2 border-black font-normal">Aksi</th>
             </tr>
           </thead>
           <tbody>
@@ -128,6 +80,11 @@
               <td class="px-4 py-2 border-2 border-black">{{ customer.kavling[0].type }}</td>
               <td class="px-4 py-2 border-2 border-black">{{ customer.kavling[0].luas_bangunan }}</td>
               <td class="px-4 py-2 border-2 border-black">{{ customer.kavling[0].luas_tanah }}</td>
+              <td class="px-4 py-2 border-2 border-black">
+                <button @click="openTicketModal(customer)" class="px-4 py-2 bg-blue-500 text-white rounded-lg">
+                  Buat Tiket
+                </button>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -135,6 +92,25 @@
     </div>
     <div v-else>
       <p class="text-end">Belum ada riwayat.</p>
+    </div>
+
+    <div v-if="isTicketModalVisible" class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+      <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+        <h2 class="text-lg font-semibold mb-4">Buat Tiket untuk {{ selectedCustomer.data_pribadi[0].namaLengkap }}
+        </h2>
+        <form @submit.prevent="submitTicket">
+          <div class="mb-4">
+            <label class="block text-sm font-medium mb-1">Isi Tiket</label>
+            <textarea v-model="ticketContent" class="w-full p-2 border border-gray-300 rounded-lg"
+              placeholder="Masukkan isi tiket"></textarea>
+          </div>
+          <div class="flex justify-end space-x-4">
+            <button @click="closeTicketModal" type="button"
+              class="px-4 py-2 bg-gray-500 text-white rounded-lg">Batal</button>
+            <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg">Kirim</button>
+          </div>
+        </form>
+      </div>
     </div>
 
     <div v-if="isModalVisible" class="fixed inset-0 flex items-center justify-center z-30 bg-black bg-opacity-50">
@@ -381,6 +357,15 @@
                 class="w-full p-2 border border-gray-300 rounded-lg" />
             </div>
           </div>
+          <h4 class="text-lg font-semibold mb-2">Pembayaran</h4>
+          <div>
+            <label class="block text-sm font-medium mb-1">Tipe Pembayaran</label>
+            <select v-model="customerForm.type_pembayaran" required
+              class="w-full p-2 border border-gray-300 rounded-lg">
+              <option value="kpr">KPR</option>
+              <option value="cash">CASH</option>
+            </select>
+          </div>
           <div class="flex justify-end space-x-4">
             <button type="button" @click="closeCustomerModal"
               class="px-4 py-2 bg-gray-500 text-white rounded-lg">Cancel</button>
@@ -394,12 +379,14 @@
       <div ref="svgContainer" class="flex justify-center items-center">
       </div>
     </div>
+
     <div ref="indicator"></div>
     <div v-if="tooltipVisible" :style="tooltipStyle"
       class="absolute bg-gray-800 text-white text-xs p-2 rounded-lg shadow-lg z-20">
       {{ tooltipText }}
     </div>
   </div>
+
 </template>
 
 
@@ -408,9 +395,9 @@ import svgPanZoom from 'svg-pan-zoom';
 import houseApi from '@/services/houseApi';
 import blokApi from '@/services/blokApi';
 import custumerApi from '@/services/custumerApi';
-import ticketApi from '@/services/ticketApi';
 
 export default {
+
   data() {
     return {
       svgUrl: '/img/file_with_ids.svg',
@@ -432,6 +419,7 @@ export default {
       customerForm: {
         id_blok: '',
         id_rumah: '',
+        type_pembayaran: '',
         kavling: {
           no_kavling: 'A12',
           type: 'Type 36',
@@ -477,11 +465,9 @@ export default {
       },
       bloks: [],
       houses: [],
-      userHistory: [], // Daftar customer dari API
-      selectedCustomer: null, // Customer yang dipilih untuk membuat tiket
-      isTicketModalVisible: false, // Status modal tiket
-      ticketContent: "", // Isi tiket
-      show: false, // Untuk menampilkan tabel
+      userHistory: [],
+      selectedCustomer: null,
+      show: false,
     };
   },
   mounted() {
@@ -495,38 +481,9 @@ export default {
       this.selectedCustomer = customer;
       this.isTicketModalVisible = true;
     },
-
-    // Menutup modal tiket
     closeTicketModal() {
       this.isTicketModalVisible = false;
-      this.ticketContent = ""; // Reset isi tiket
-    },
-
-    // Mengirim tiket ke API
-    async submitTicket() {
-      if (!this.ticketContent) {
-        this.$toast.error("Isi tiket wajib diisi!", { duration: 3000 });
-        return;
-      }
-
-      const ticketData = {
-        ticket_header: [
-          {
-            id_user: this.$store.state.user._id, // ID marketing dari store
-            id_customer: this.selectedCustomer._id, // ID customer yang dipilih
-          },
-        ],
-        ticket_contain: this.ticketContent,
-      };
-
-      try {
-        await ticketApi.create(ticketData);
-        this.$toast.success("Tiket berhasil dikirim!", { duration: 3000 });
-        this.closeTicketModal();
-      } catch (error) {
-        this.$toast.error("Gagal mengirim tiket", { duration: 3000 });
-        console.error("Error creating ticket:", error);
-      }
+      this.ticketContent = "";
     },
     riwayat() {
       if (this.show !== true) {
@@ -592,10 +549,16 @@ export default {
         if (id) {
           const house = this.houses.find((h) => h.id_rumah === id);
 
-          if (house && house.status_rumah === true) {
+          if (house && house.status_rumah === "deterjual") {
             path.classList.add('fill-green-500');
-          } else if (house && house.status_rumah === false) {
+          } else if (house && house.status_rumah === "terbooking") {
             path.classList.add('fill-gray-500');
+          } else if (house && house.status_rumah === "terjual") {
+            path.classList.add('fill-che');
+          } else if (house && house.status_rumah === "cash") {
+            path.classList.add('fill-maryjane');
+          } else if (house && house.status_rumah === "kpn") {
+            path.classList.add('fill-blue-600');
           }
 
           path.classList.add(
@@ -648,13 +611,22 @@ export default {
     handleClick(id, house) {
       this.selectedId = id;
 
-      if (house && house.status_rumah === true) {
+      if (house && house.status_rumah === "deterjual") {
         this.customerForm.id_rumah = house._id;
         this.customerForm.id_blok = house.id_blok;
         this.closeModal();
         this.loadHouseData(id, house.id_blok);
-      } else if (house && house.status_rumah === false) {
+      } else if (house && house.status_rumah === "terjual") {
         alert('Rumah Sudah Terjual');
+        this.closeModal();
+      } else if (house && house.status_rumah === "cash") {
+        alert('Rumah Sudah Terjual Cash');
+        this.closeModal();
+      } else if (house && house.status_rumah === "terbooking") {
+        alert('Rumah Sudah Terjual');
+        this.closeModal();
+      } else if (house && house.status_rumah === "kpr") {
+        alert('Rumah Dalam Kpr');
         this.closeModal();
       }
     },
@@ -706,6 +678,7 @@ export default {
         }
         formData.append("id_blok", this.customerForm.id_blok);
         formData.append("id_rumah", this.customerForm.id_rumah);
+        formData.append("type_pembayaran", this.customerForm.type_pembayaran)
 
         if (!this.customerForm.kavling) {
           throw new Error("Data Kavling wajib diisi.");
@@ -723,11 +696,11 @@ export default {
         formData.append("pekerjaan", JSON.stringify([this.customerForm.pekerjaan]));
 
         for (let fileKey in this.customerForm.customerFile) {
-          if (this.customerForm.customerFile[fileKey]) {
-            formData.append(fileKey, this.customerForm.customerFile[fileKey]);
-          } else {
-            throw new Error(`File ${fileKey} wajib diupload.`);
-          }
+          formData.append(fileKey, this.customerForm.customerFile[fileKey]);
+          // if (this.customerForm.customerFile[fileKey]) {
+          // } else {
+          //   throw new Error(`File ${fileKey} wajib diupload.`);
+          // }
         }
 
         await custumerApi.create(formData, {

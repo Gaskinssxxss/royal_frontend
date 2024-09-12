@@ -277,6 +277,26 @@
                                 </tbody>
                             </table>
 
+                            <div v-if="shows" class="inset-0 h-screen z-50 flex justify-center items-center">
+                                <div>
+                                    <div>
+                                        <select v-model="kondisis">
+                                            <option value="terjual">terjual</option>
+                                            <option value="terbooking">terbooking</option>
+                                            <option value="cash">cash</option>
+                                            <option value="kpr">kpr</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div>
+                                    <button @click="terjual(custom.id_rumah._id, kondisis)">
+                                        <h1>
+                                            sukses
+                                        </h1>
+                                    </button>
+                                </div>
+                            </div>
+
                             <div class="mt-4 flex justify-between">
                                 <div class="bg-black">
                                     <button @click="changeModalPage(3)"
@@ -293,7 +313,7 @@
                                     </button>
                                 </div>
                                 <div class="bg-black">
-                                    <button @click="terjual(custom.id_rumah._id)"
+                                    <button @click="terjuals"
                                         class="bg-gray-200 text-black border-2 border-black px-4 py-2 transition-transform duration-300 ease-linear transform -translate-x-1 -translate-y-1 hover:-translate-x-2 hover:-translate-y-2">
                                         Rumah Terjual
                                     </button>
@@ -318,6 +338,7 @@ export default {
     },
     data() {
         return {
+            kondisis: "",
             customer: [],
             selectedBlokname: '',
             blokOptions: [
@@ -378,7 +399,8 @@ export default {
             selectedId: '',
             modalPage: 1,
             lightboxVisible: false,
-            lightboxImages: []
+            lightboxImages: [],
+            shows: false
         }
     },
     mounted() {
@@ -430,8 +452,11 @@ export default {
                     alert('Gagal memperbarui status rumah');
                 });
         },
-        terjual(houseId) {
-            custumerApi.updateHouseStatus(houseId)
+        terjuals() {
+            this.shows = true
+        },
+        terjual(houseId, kondisi) {
+            custumerApi.updateHouseStatus(houseId, kondisi)
                 .then(() => {
                     alert('Status rumah berhasil diperbarui menjadi terjual');
                     this.getUnverifiedCustomers();

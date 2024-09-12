@@ -33,11 +33,11 @@ export default {
   cancelVerificationStatus(id) {
     return Api.put(`/verifikasi/batal/${id}`, { verifikasi_data: false });
   },
-  updateHouseStatus(id) {
-    return Api.put(`/update-house-status/${id}`, { status_rumah: false });
+  updateHouseStatus(id, kondisi) {
+    return Api.put(`/update-house-status/${id}`, { status_rumah: kondisi });
   },
-  deupdateHouseStatus(id) {
-    return Api.put(`/deupdate-house-status/${id}`, { status_rumah: true });
+  deupdateHouseStatus(id, kondisi) {
+    return Api.put(`/deupdate-house-status/${id}`, { status_rumah: kondisi });
   },
   delete(id) {
     return Api.delete(`/customer/delete/${id}`);
@@ -49,5 +49,8 @@ export default {
   },
   getUserHistory() {
     return Api.get("/user/history");
+  },
+  historyVerifiedCustomer() {
+    return Api.get("/history/verified-customers/");
   },
 };

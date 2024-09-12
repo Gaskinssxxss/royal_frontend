@@ -5,11 +5,22 @@ import LoginView from "@/views/LoginView.vue";
 import RegisterView from "@/views/RegisterView.vue";
 import UnauthorizedView from "@/views/UnauthorizedView.vue";
 import store from "@/services/store";
+import LiveChat from "@/views/LiveChat.vue";
 
 const routes = [
   {
     path: "/",
     redirect: { name: "Login" },
+  },
+  {
+    path: "/Live-chat",
+    name: "Live Chat",
+    component: LiveChat,
+    meta: {
+      title: "Live Chat",
+      authRequired: false,
+      // role: "marketing",
+    },
   },
   {
     path: "/Marketing",

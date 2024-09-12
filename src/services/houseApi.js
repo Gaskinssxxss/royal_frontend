@@ -16,4 +16,7 @@ export default {
   delete(id) {
     return Api.delete(`/house/delete/${id}`);
   },
+  getBlokandHouse() {
+    return Api.get("/blocks-and-houses");
+  },
 };

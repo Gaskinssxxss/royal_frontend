@@ -35,8 +35,8 @@
 </template>
 
 <script>
-import ticketApi from "@/services/ticketApi";
-import customerApi from "@/services/customerApi";
+import ticketApi from "@/services/ticketApi.js";
+import customerApi from "@/services/custumerApi.js";
 
 export default {
     data() {

@@ -27,6 +27,12 @@
                         <h1 class="pl-2 uppercase">Dashboard</h1>
                     </button>
                 </div>
+                <div @click="live" :class="{ 'bg-red-500': isClick.live }"
+                    class="hover:bg-gray-200 hover:border hover:border-gray-200">
+                    <button>
+                        <h1 class="pl-2 uppercase">Live Chat</h1>
+                    </button>
+                </div>
                 <div @click="verifikasi" :class="{ 'bg-red-500': isClick.verifikasi }"
                     class="hover:bg-gray-200 hover:border hover:border-gray-200 flex space-x-2">
                     <div>
@@ -82,6 +88,18 @@
                         <h1 class="pl-2 uppercase">Hapus Akun</h1>
                     </button>
                 </div>
+                <div @click="TicketReques" :class="{ 'bg-red-500': isClick.tiketlist }"
+                    class="hover:bg-gray-200 hover:border hover:border-gray-200">
+                    <button>
+                        <h1 class="pl-2 uppercase">Live Chat</h1>
+                    </button>
+                </div>
+                <div @click="historyPenjualan" :class="{ 'bg-red-500': isClick.historypenjualan }"
+                    class="hover:bg-gray-200 hover:border hover:border-gray-200">
+                    <button>
+                        <h1 class="pl-2 uppercase">History Penjualan</h1>
+                    </button>
+                </div>
                 <div @click="logout" :class="{ 'bg-red-500': isClick.LogOut }"
                     class="hover:bg-gray-200 hover:border hover:border-gray-200">
                     <button>
@@ -118,6 +136,15 @@
                     <div v-if="deleteakun">
                         <DeleteAccount />
                     </div>
+                    <div v-if="tiketlist">
+                        <ticketList />
+                    </div>
+                    <div v-if="historypenjualan">
+                        <HistoryPenjualan />
+                    </div>
+                    <div v-if="adminlive">
+                        <adminLiveChat />
+                    </div>
                 </div>
             </div>
         </div>
@@ -135,6 +162,9 @@ import CreateAccount from '@/components/CreateAccount.vue';
 import EditAccount from '@/components/EditAccount.vue';
 import DeleteAccount from '@/components/deleteAccount.vue';
 import custumerApi from '@/services/custumerApi';
+import ticketList from '@/components/ticketList.vue';
+import HistoryPenjualan from '@/components/HistoryPenjualan.vue';
+import adminLiveChat from '@/components/adminLiveChat.vue';
 
 export default {
     components: {
@@ -146,7 +176,10 @@ export default {
         accountList,
         CreateAccount,
         EditAccount,
-        DeleteAccount
+        DeleteAccount,
+        ticketList,
+        HistoryPenjualan,
+        adminLiveChat
     },
     data() {
         return {
@@ -161,6 +194,9 @@ export default {
                 editaccount: false,
                 deleteaccount: false,
                 LogOut: false,
+                tiketlist: false,
+                historypenjualan: false,
+                live: false
             },
             ds: true,
             vd: false,
@@ -171,7 +207,10 @@ export default {
             createaccount: false,
             editakun: false,
             deleteakun: false,
-            nilai: 0
+            tiketlist: false,
+            historypenjualan: false,
+            nilai: 0,
+            adminlive: false
         }
     },
     computed: {
@@ -183,6 +222,22 @@ export default {
         this.getUnverifiedCustomers()
     },
     methods: {
+        live() {
+            this.resets()
+            this.adminlive = true;
+            this.isClick.adminlive = true
+        },
+        historyPenjualan() {
+            this.resets();
+            this.historypenjualan = true;
+            this.isClick.historypenjualan = true;
+
+        },
+        TicketReques() {
+            this.resets();
+            this.isClick.tiketlist = true
+            this.tiketlist = true;
+        },
         getUnverifiedCustomers() {
             custumerApi.getUnverifiedCustomers()
                 .then(res => {
@@ -233,6 +288,7 @@ export default {
             this.ed = false;
             this.de = false;
             this.dt = false;
+            this.adminlive = false;
             this.lsaccount = false;
             this.createaccount = false;
             this.isClick.dashboard = false;
@@ -246,7 +302,11 @@ export default {
             this.isClick.editaccount = false;
             this.deleteakun = false;
             this.isClick.deleteaccount = false;
-
+            this.isClick.tiketlist = false
+            this.tiketlist = false;
+            this.historypenjualan = false;
+            this.isClick.historypenjualan = false;
+            this.isClick.live = false
         },
         deleted() {
             this.resets();
