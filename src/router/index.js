@@ -6,11 +6,43 @@ import RegisterView from "@/views/RegisterView.vue";
 import UnauthorizedView from "@/views/UnauthorizedView.vue";
 import store from "@/services/store";
 import LiveChat from "@/views/LiveChat.vue";
-
+import keuanganPage from "@/components/keuanganPage.vue";
+import progresBar from "@/components/progresBar.vue";
+import KeunganDashboard from "@/views/KeunganDashboard.vue";
 const routes = [
   {
     path: "/",
     redirect: { name: "Login" },
+  },
+  {
+    path: "/keuangan",
+    name: "Keuangan",
+    component: keuanganPage,
+    meta: {
+      title: "Keuangan",
+      authRequired: true,
+      role: "marketing",
+    },
+  },
+  {
+    path: "/keuanganDashboard",
+    name: "KeuanganDashboard",
+    component: KeunganDashboard,
+    meta: {
+      title: "Keuangan",
+      authRequired: true,
+      role: "keuangan",
+    },
+  },
+  {
+    path: "/progres",
+    name: "Progres",
+    component: progresBar,
+    meta: {
+      title: "Progres",
+      authRequired: true,
+      role: "marketing",
+    },
   },
   {
     path: "/Live-chat",
@@ -18,8 +50,8 @@ const routes = [
     component: LiveChat,
     meta: {
       title: "Live Chat",
-      authRequired: false,
-      // role: "marketing",
+      authRequired: true,
+      role: "marketing",
     },
   },
   {
@@ -82,7 +114,18 @@ router.beforeEach(async (to, from, next) => {
 
   const isAuthenticated = store.state.userLoggedIn;
   const userRole = store.state.userRole;
-  if (to.meta.authRequired && !isAuthenticated) {
+
+  if (isAuthenticated && (to.name === "Login" || to.name === "Register")) {
+    if (userRole === "admin") {
+      next({ name: "Admin Dashboard" });
+    } else if (userRole === "marketing") {
+      next({ name: "Marketing" });
+    } else if (userRole === "keuangan") {
+      next({ name: "KeuanganDashboard" });
+    } else {
+      next({ name: "Unauthorized" });
+    }
+  } else if (to.meta.authRequired && !isAuthenticated) {
     next({ name: "Login" });
   } else if (
     to.meta.authRequired &&
@@ -95,8 +138,27 @@ router.beforeEach(async (to, from, next) => {
   }
 });
 
+// router.beforeEach(async (to, from, next) => {
+//   if (!store.state.isStoreUpdated) {
+//     await store.dispatch("updateStore");
+//   }
+
+//   const isAuthenticated = store.state.userLoggedIn;
+//   const userRole = store.state.userRole;
+//   if (to.meta.authRequired && !isAuthenticated) {
+//     next({ name: "Login" });
+//   } else if (
+//     to.meta.authRequired &&
+//     to.meta.role &&
+//     to.meta.role !== userRole
+//   ) {
+//     next({ name: "Unauthorized" });
+//   } else {
+//     next();
+//   }
+// });
+
 router.afterEach((to) => {
   document.title = to.meta.title;
 });
-
 export default router;

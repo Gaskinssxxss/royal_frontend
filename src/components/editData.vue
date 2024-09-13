@@ -1,47 +1,71 @@
 <template>
   <div class="relative w-full h-screen p-4 bg-gray-100">
-    <!-- Customer List -->
+    <div class="mb-4 flex space-x-4">
+      <select v-model="selectedBlokname" class="border-2 border-black px-4 py-2 flex-grow">
+        <option disabled value="">Pilih Blok</option>
+        <option value="semua">Semua</option>
+        <option v-for="blok in blokOptions" :key="blok._id.$oid" :value="blok.blokname"
+          class="font-bold font-Jet capitalize tracking-wide">
+          {{ blok.blokname }}
+        </option>
+      </select>
+      <div class="bg-black rounded">
+        <button @click="searchCustomer"
+          class=" bg-gray-200 rounded text-black border-2 border-black px-4 py-2 transition-transform duration-300 ease-linear transform -translate-x-1 -translate-y-1 hover:-translate-x-2 hover:-translate-y-2">
+          Cari
+        </button>
+      </div>
+    </div>
+
     <div v-if="customers.length > 0">
-      <h2 class="text-lg font-semibold mb-4">Customer List</h2>
       <table class="min-w-full border-collapse border-2 border-black text-center">
         <thead>
           <tr>
-            <th class="border-2 border-black px-2 py-2">Nama Lengkap</th>
-            <th class="border-2 border-black px-2 py-2">Alamat</th>
-            <th class="border-2 border-black px-2 py-2">No Kontak</th>
-            <th class="border-2 border-black px-2 py-2">Aksi</th>
+            <th class="border-2 border-black px-2 py-2 font-normal">Marketer</th>
+            <th class="border-2 border-black px-2 py-2 font-normal">Nama Lengkap Customer</th>
+            <th class="border-2 border-black px-2 py-2 font-normal">Nomor Hp Customer</th>
+            <th class="border-2 border-black px-2 py-2 font-normal">Email Customer</th>
+            <th class="border-2 border-black px-2 py-2 font-normal">Nama Blok</th>
+            <th class="border-2 border-black px-2 py-2 font-normal">Nomor Rumah</th>
+            <th class="border-2 border-black px-2 py-2 font-normal">Tipe Rumah</th>
+            <th class="border-2 border-black px-2 py-2 font-normal">Aksi</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="customer in customers" :key="customer._id">
+            <td class="border-2 border-black px-2 py-2">{{ customer.id_user.username }}</td>
             <td class="border-2 border-black px-2 py-2">{{ customer.data_pribadi[0].namaLengkap }}</td>
-            <td class="border-2 border-black px-2 py-2">{{ customer.data_pribadi[0].alamat }}</td>
             <td class="border-2 border-black px-2 py-2">{{ customer.data_pribadi[0].no_kontak }}</td>
-            <td class="border-2 border-black px-2 py-2">
-              <button @click="openEditCustomerModal(customer)" class="bg-blue-500 text-white px-4 py-2 rounded-lg">
-                Edit Data
-              </button>
+            <td class="border-2 border-black px-2 py-2">{{ customer.data_pribadi[0].email }}</td>
+            <td class="border-2 border-black px-2 py-2">{{ customer.id_blok.blokname }}</td>
+            <td class="border-2 border-black px-2 py-2">{{ customer.id_rumah.no_rumah }}</td>
+            <td class="border-2 border-black px-2 py-2">{{ customer.id_rumah.type_rumah }}</td>
+            <td class="border-2 border-black pl-2 pt-3 pb-2">
+              <div>
+                <button @click="openEditCustomerModal(customer)" class="bg-black text-black rounded">
+                  <h1
+                    class="bg-gray-200 border-2 px-4 py-2 border-black uppercase rounded transition-transform duration-300 ease-linear transform -translate-x-1 -translate-y-1 hover:-translate-x-2 hover:-translate-y-2">
+                    Edit
+                  </h1>
+                </button>
+              </div>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
-
-    <!-- No Customers Message -->
     <div v-else>
-      <p class="text-center">No customers found.</p>
+      <p class="text-red-500">Tidak ada hasil yang ditemukan untuk pencarian "{{ selectedBlokname }}"</p>
     </div>
-
-     <!-- Edit Customer Data Modal -->
-     <div v-if="isCustomerModalVisible"
+    <div v-if="isCustomerModalVisible"
       class="fixed inset-0 flex items-center justify-center z-30 bg-black bg-opacity-50">
       <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-3xl h-4/5 overflow-y-auto">
         <h2 class="text-lg font-semibold mb-4">Form Customer Data</h2>
         <form @submit.prevent="submitCustomerForm">
-          <!-- Blok and No Rumah -->
           <div class="mb-4">
             <label class="block text-sm font-medium mb-1">Blok</label>
-            <select v-model="customerForm.id_blok" @change="filterHousesByBlock" required class="w-full p-2 border border-gray-300 rounded-lg">
+            <select v-model="customerForm.id_blok" @change="filterHousesByBlock" required
+              class="w-full p-2 border border-gray-300 rounded-lg">
               <option v-for="blok in bloks" :key="blok._id" :value="blok._id">{{ blok.blokname }}</option>
             </select>
           </div>
@@ -51,8 +75,6 @@
               <option v-for="house in filteredHouses" :key="house._id" :value="house._id">{{ house.no_rumah }}</option>
             </select>
           </div>
-
-          <!-- Kavling Section -->
           <h3 class="text-lg font-semibold mb-2">Kavling</h3>
           <div class="grid grid-cols-2 gap-4 mb-4">
             <div>
@@ -76,8 +98,6 @@
                 class="w-full p-2 border border-gray-300 rounded-lg" />
             </div>
           </div>
-
-          <!-- Data Pribadi Section -->
           <h3 class="text-lg font-semibold mb-2">Data Pribadi</h3>
           <div class="grid grid-cols-2 gap-4 mb-4">
             <div>
@@ -155,8 +175,6 @@
                 class="w-full p-2 border border-gray-300 rounded-lg" />
             </div>
           </div>
-
-          <!-- Pekerjaan Section -->
           <h3 class="text-lg font-semibold mb-2">Pekerjaan</h3>
           <div class="grid grid-cols-2 gap-4 mb-4">
             <div>
@@ -215,56 +233,57 @@
                 class="w-full p-2 border border-gray-300 rounded-lg" />
             </div>
           </div>
-
-    
-  <!-- Customer Files Section -->
-  <h3 class="text-lg font-semibold mb-2">Customer Files</h3>
+          <h3 class="text-lg font-semibold mb-2">Customer Files</h3>
           <div class="grid grid-cols-2 gap-4 mb-4">
             <div>
               <label class="block text-sm font-medium mb-1">KTP</label>
               <div v-if="customers[0].customerFile[0].ktp">
                 <img :src="getImageUrl(customers[0].customerFile[0].ktp)" class="w-full mb-2">
               </div>
-              <input type="file" @change="handleFileUpload($event, 'ktp')" class="w-full p-2 border border-gray-300 rounded-lg" />
+              <input type="file" @change="handleFileUpload($event, 'ktp')"
+                class="w-full p-2 border border-gray-300 rounded-lg" />
             </div>
             <div>
               <label class="block text-sm font-medium mb-1">NPWP</label>
               <div v-if="customers[0].customerFile[0].npwp">
                 <img :src="getImageUrl(customers[0].customerFile[0].npwp)" class="w-full mb-2">
               </div>
-              <input type="file" @change="handleFileUpload($event, 'npwp')" class="w-full p-2 border border-gray-300 rounded-lg" />
+              <input type="file" @change="handleFileUpload($event, 'npwp')"
+                class="w-full p-2 border border-gray-300 rounded-lg" />
             </div>
             <div>
               <label class="block text-sm font-medium mb-1">KK</label>
               <div v-if="customers[0].customerFile[0].kk">
                 <img :src="getImageUrl(customers[0].customerFile[0].kk)" class="w-full mb-2">
               </div>
-              <input type="file" @change="handleFileUpload($event, 'kk')" class="w-full p-2 border border-gray-300 rounded-lg" />
+              <input type="file" @change="handleFileUpload($event, 'kk')"
+                class="w-full p-2 border border-gray-300 rounded-lg" />
             </div>
             <div>
               <label class="block text-sm font-medium mb-1">Slip Gaji</label>
               <div v-if="customers[0].customerFile[0].slip_gaji">
                 <img :src="getImageUrl(customers[0].customerFile[0].slip_gaji)" class="w-full mb-2">
               </div>
-              <input type="file" @change="handleFileUpload($event, 'slip_gaji')" class="w-full p-2 border border-gray-300 rounded-lg" />
+              <input type="file" @change="handleFileUpload($event, 'slip_gaji')"
+                class="w-full p-2 border border-gray-300 rounded-lg" />
             </div>
             <div>
               <label class="block text-sm font-medium mb-1">Buku Nikah</label>
               <div v-if="customers[0].customerFile[0].buku_nikah">
                 <img :src="getImageUrl(customers[0].customerFile[0].buku_nikah)" class="w-full mb-2">
               </div>
-              <input type="file" @change="handleFileUpload($event, 'buku_nikah')" class="w-full p-2 border border-gray-300 rounded-lg" />
+              <input type="file" @change="handleFileUpload($event, 'buku_nikah')"
+                class="w-full p-2 border border-gray-300 rounded-lg" />
             </div>
             <div>
               <label class="block text-sm font-medium mb-1">Pas Foto</label>
               <div v-if="customers[0].customerFile[0].pas_foto">
                 <img :src="getImageUrl(customers[0].customerFile[0].pas_foto)" class="w-full mb-2">
               </div>
-              <input type="file" @change="handleFileUpload($event, 'pas_foto')" class="w-full p-2 border border-gray-300 rounded-lg" />
+              <input type="file" @change="handleFileUpload($event, 'pas_foto')"
+                class="w-full p-2 border border-gray-300 rounded-lg" />
             </div>
           </div>
-
-          <!-- Submit Button -->
           <div class="flex justify-end space-x-4">
             <button type="button" @click="closeCustomerModal"
               class="px-4 py-2 bg-gray-500 text-white rounded-lg">Cancel</button>
@@ -277,16 +296,72 @@
 </template>
 
 <script>
- import CustomerService from "@/services/custumerApi.js"
- import houseApi from "@/services/houseApi.js"
+import CustomerService from "@/services/custumerApi.js"
+import houseApi from "@/services/houseApi.js"
+import Swal from 'sweetalert2';
 export default {
   data() {
     return {
-      customers: [], // List of customers
-      isCustomerModalVisible: false, // Controls modal visibility
-      bloks: [], // List of blok
-      houses: [], // List of houses
-      filteredHouses: [], // Houses filtered by blok
+      customers: [],
+      selectedBlokname: '',
+      blokOptions: [
+        { "_id": { "$oid": "66dc1aa8dc6375e185b9ff0d" }, "blokname": "TERATAI" },
+        { "_id": { "$oid": "66dc1ab1dc6375e185b9ff10" }, "blokname": "LAVENDER" },
+        { "_id": { "$oid": "66dc1ab3dc6375e185b9ff13" }, "blokname": "ANYELIR" },
+        { "_id": { "$oid": "66dc1ab9dc6375e185b9ff16" }, "blokname": "KAMBOJA" },
+        { "_id": { "$oid": "66dc1abcdc6375e185b9ff19" }, "blokname": "CAMELIA" },
+        { "_id": { "$oid": "66dc1ac2dc6375e185b9ff1c" }, "blokname": "LILY" },
+        { "_id": { "$oid": "66dc1acadc6375e185b9ff1f" }, "blokname": "BOUGENVILLE" },
+        { "_id": { "$oid": "66dc1acddc6375e185b9ff22" }, "blokname": "MATAHARI" },
+        { "_id": { "$oid": "66dc1ad3dc6375e185b9ff26" }, "blokname": "MATAHARI-A" },
+        { "_id": { "$oid": "66dc1ad7dc6375e185b9ff29" }, "blokname": "MATAHARI-B" },
+        { "_id": { "$oid": "66dc1adbdc6375e185b9ff2c" }, "blokname": "MATAHARI-C" },
+        { "_id": { "$oid": "66dc1ae1dc6375e185b9ff2f" }, "blokname": "MATAHARI-D" },
+        { "_id": { "$oid": "66dc1ae8dc6375e185b9ff32" }, "blokname": "TULIP" },
+        { "_id": { "$oid": "66dc1aeedc6375e185b9ff35" }, "blokname": "BROMELIA" },
+        { "_id": { "$oid": "66dc1af3dc6375e185b9ff38" }, "blokname": "BROMELIA-A" },
+        { "_id": { "$oid": "66dc1afadc6375e185b9ff3b" }, "blokname": "BROMELIA-B" },
+        { "_id": { "$oid": "66dc1b00dc6375e185b9ff3e" }, "blokname": "BROMELIA-C" },
+        { "_id": { "$oid": "66dc1b03dc6375e185b9ff41" }, "blokname": "BROMELIA-D" },
+        { "_id": { "$oid": "66dc1b13dc6375e185b9ff44" }, "blokname": "ALLYSUM" },
+        { "_id": { "$oid": "66dc1b14dc6375e185b9ff47" }, "blokname": "ALLYSUM-A" },
+        { "_id": { "$oid": "66dc1b16dc6375e185b9ff4a" }, "blokname": "ALLYSUM-B" },
+        { "_id": { "$oid": "66dc1b17dc6375e185b9ff4d" }, "blokname": "ALLYSUM-C" },
+        { "_id": { "$oid": "66dc1b2bdc6375e185b9ff50" }, "blokname": "SERUNI" },
+        { "_id": { "$oid": "66dc1b41dc6375e185b9ff53" }, "blokname": "KENANGA" },
+        { "_id": { "$oid": "66dc1b73dc6375e185b9ff59" }, "blokname": "AZALEA" },
+        { "_id": { "$oid": "66dc1b77dc6375e185b9ff5c" }, "blokname": "FLAMBOYAN" },
+        { "_id": { "$oid": "66dc1b7bdc6375e185b9ff5f" }, "blokname": "DAHLIA" },
+        { "_id": { "$oid": "66dc1b7edc6375e185b9ff62" }, "blokname": "GARDENIA" },
+        { "_id": { "$oid": "66dc1b83dc6375e185b9ff65" }, "blokname": "ALAMANDA" },
+        { "_id": { "$oid": "66dc1b85dc6375e185b9ff68" }, "blokname": "CEMPAKA" },
+        { "_id": { "$oid": "66dc1b88dc6375e185b9ff6b" }, "blokname": "MELATI" },
+        { "_id": { "$oid": "66dc1b93dc6375e185b9ff6e" }, "blokname": "ANGGREK" },
+        { "_id": { "$oid": "66dc1b94dc6375e185b9ff71" }, "blokname": "ANGGREK-A" },
+        { "_id": { "$oid": "66dc1b96dc6375e185b9ff74" }, "blokname": "ANGGREK-B" },
+        { "_id": { "$oid": "66dc1b97dc6375e185b9ff77" }, "blokname": "ANGGREK-C" },
+        { "_id": { "$oid": "66dc1b99dc6375e185b9ff7a" }, "blokname": "ANGGREK-D" },
+        { "_id": { "$oid": "66dc1ba3dc6375e185b9ff7d" }, "blokname": "ASOKA" },
+        { "_id": { "$oid": "66dc1ba4dc6375e185b9ff80" }, "blokname": "ASOKA-A" },
+        { "_id": { "$oid": "66dc1ba5dc6375e185b9ff83" }, "blokname": "ASOKA-B" },
+        { "_id": { "$oid": "66dc1ba7dc6375e185b9ff86" }, "blokname": "ASOKA-C" },
+        { "_id": { "$oid": "66dc1ba8dc6375e185b9ff89" }, "blokname": "ASOKA-D" },
+        { "_id": { "$oid": "66dc1baadc6375e185b9ff8c" }, "blokname": "ASOKA-E" },
+        { "_id": { "$oid": "66dc1baddc6375e185b9ff8f" }, "blokname": "ASOKA-F" },
+        { "_id": { "$oid": "66dc1bb0dc6375e185b9ff92" }, "blokname": "ASOKA-G" },
+        { "_id": { "$oid": "66dc1bb2dc6375e185b9ff95" }, "blokname": "ASOKA-H" },
+        { "_id": { "$oid": "66dc1bc4dc6375e185b9ff98" }, "blokname": "AMARYLIS" },
+        { "_id": { "$oid": "66dc1bd6dc6375e185b9ff9b" }, "blokname": "ADHYAKSA UTAMA" },
+        { "_id": { "$oid": "66dc1be4dc6375e185b9ff9e" }, "blokname": "EDELWEISS" },
+        { "_id": { "$oid": "66dc1be5dc6375e185b9ffa1" }, "blokname": "EDELWEISS-A" },
+        { "_id": { "$oid": "66dc1be7dc6375e185b9ffa4" }, "blokname": "EDELWEISS-B" },
+        { "_id": { "$oid": "66dc1be9dc6375e185b9ffa7" }, "blokname": "EDELWEISS-C" },
+        { "_id": { "$oid": "66dc1beadc6375e185b9ffaa" }, "blokname": "EDELWEISS-D" }
+      ],
+      isCustomerModalVisible: false,
+      bloks: [],
+      houses: [],
+      filteredHouses: [],
       customerForm: {
         id_blok: "",
         id_rumah: "",
@@ -340,22 +415,46 @@ export default {
     this.fetchBlocksAndHouses();
   },
   methods: {
-  handleFileUpload(event, field) {
-  const files = event.target.files; 
-  if (files && files.length > 0) {
-    this.customerForm.customerFiles[field] = files[0];
-  } else {
-    console.error(`No files selected for field: ${field}`);
-  }
-},
-    
+    showAlert(message, type = 'info') {
+      Swal.fire({
+        title: 'Information',
+        text: message,
+        icon: type,
+        confirmButtonText: 'OK',
+      });
+    },
+    showSuccessAlert(message) {
+      Swal.fire({
+        title: 'Success',
+        text: message,
+        icon: 'success',
+        confirmButtonText: 'Ok!',
+      });
+    },
+    showErrorAlert(message) {
+      Swal.fire({
+        title: 'Error',
+        text: message,
+        icon: 'error',
+        confirmButtonText: 'Ok!',
+      });
+    },
+    handleFileUpload(event, field) {
+      const files = event.target.files;
+      if (files && files.length > 0) {
+        this.customerForm.customerFiles[field] = files[0];
+      } else {
+        console.error(`No files selected for field: ${field}`);
+      }
+    },
+
     getImageUrl(filePath) {
       return `http://192.168.1.4:3000/${filePath}`;
     },
 
     async fetchBlocksAndHouses() {
       try {
-        const response = await houseApi.getBlokandHouse(); 
+        const response = await houseApi.getBlokandHouse();
         this.bloks = response.data.blocks;
         this.houses = response.data.houses;
       } catch (error) {
@@ -363,7 +462,7 @@ export default {
       }
     },
 
-   
+
     filterHousesByBlock() {
       this.filteredHouses = this.houses.filter(
         (house) => house.id_blok._id === this.customerForm.id_blok
@@ -372,7 +471,7 @@ export default {
 
     async fetchCustomers() {
       try {
-        const response = await CustomerService.getAll(); 
+        const response = await CustomerService.getAll();
         this.customers = response.data.data;
       } catch (error) {
         console.error("Error fetching customers:", error);
@@ -453,6 +552,28 @@ export default {
 
     closeCustomerModal() {
       this.isCustomerModalVisible = false;
+    },
+    searchCustomer() {
+      this.customers = [];
+      if (this.selectedBlokname == 'semua') {
+        this.fetchCustomers();
+        return;
+      }
+      if (this.selectedBlokname.length > 0) {
+        CustomerService.searchCustomerByBlokname(this.selectedBlokname)
+          .then(res => {
+            if (res.data.data.length > 0) {
+              this.customers = res.data.data;
+            } else {
+              this.showAlert(`Tidak ada customer di blok ${this.selectedBlokname}`);
+            }
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      } else {
+        this.showAlert('Pilih nama blok untuk melakukan pencarian.');
+      }
     },
   },
 };

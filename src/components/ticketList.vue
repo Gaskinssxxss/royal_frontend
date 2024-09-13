@@ -35,6 +35,7 @@
 
 <script>
 import ticketApi from "@/services/ticketApi";
+import Swal from 'sweetalert2';
 export default {
   data() {
     return {
@@ -44,6 +45,30 @@ export default {
     };
   },
   methods: {
+    showAlert(message, type = 'info') {
+      Swal.fire({
+        title: 'Information',
+        text: message,
+        icon: type,
+        confirmButtonText: 'OK',
+      });
+    },
+    showSuccessAlert(message) {
+      Swal.fire({
+        title: 'Success',
+        text: message,
+        icon: 'success',
+        confirmButtonText: 'Ok!',
+      });
+    },
+    showErrorAlert(message) {
+      Swal.fire({
+        title: 'Error',
+        text: message,
+        icon: 'error',
+        confirmButtonText: 'Ok!',
+      });
+    },
     closeReplyticket() {
       this.selectedTicket = null;
     },
@@ -61,21 +86,21 @@ export default {
     },
     async replyToTicket() {
       if (!this.response.trim()) {
-        alert("Please enter a response");
+        this.showAlert("Please enter a response");
         return;
       }
 
       const updatedTicket = {
         ticket_contain: this.response,
-        ticket_status: true, // Mark as responded
+        ticket_status: true,
       };
 
       try {
         await ticketApi.update(this.selectedTicket._id, updatedTicket);
-        alert("Response sent!");
+        this.showSuccessAlert("Response sent!");
         this.response = "";
         this.selectedTicket = null;
-        this.fetchTickets(); // Refresh the ticket list
+        this.fetchTickets();
       } catch (error) {
         console.error("Error replying to ticket:", error);
       }

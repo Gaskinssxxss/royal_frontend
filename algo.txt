@@ -12,3 +12,23 @@ kondisi cash
 
 kondisi terbooking
 => cancel || lengkapi data ( => terjual || kpr || cash )
+
+
+
+var data customer
+var pembayaran (dp)
+
+role marketing (data customer)
+role keuangan (pembayaran)
+role admin (verifikasi data)
+
+if data customer (marketing)
+    if pembayaran === true ( keuangan)
+        verifikasi data = true( admin)
+    else pemabaayaran !== true (keuangan)
+        verifikasi data = false (admin)
+
+
+kasir {
+    
+}

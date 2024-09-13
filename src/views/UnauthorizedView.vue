@@ -13,7 +13,7 @@ export default {
     name: "UnauthoriZed",
     methods: {
         goBack() {
-            this.$router.back(); // This will navigate back to the previous page
+            this.$router.back();
         }
     }
 }

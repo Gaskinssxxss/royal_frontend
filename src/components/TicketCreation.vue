@@ -75,8 +75,8 @@ export default {
             const ticketData = {
                 ticket_header: [
                     {
-                        id_user: this.$store.state.auth.user._id, // ID marketing dari state
-                        id_customer: this.customer._id, // ID customer yang dipilih
+                        id_user: this.$store.state.auth.user._id,
+                        id_customer: this.customer._id,
                     },
                 ],
                 ticket_contain: this.ticketContent,

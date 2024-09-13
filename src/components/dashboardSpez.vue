@@ -83,8 +83,8 @@ export default {
                 if (!Array.isArray(customers)) {
                     console.error("Customers is not an array:", customers);
                 }
-                this.soldCount = Array.isArray(houses) ? houses.filter(house => house.status_rumah === false).length : 0;
-                this.notSoldCount = Array.isArray(houses) ? houses.filter(house => house.status_rumah === true).length : 0;
+                this.soldCount = Array.isArray(houses) ? houses.filter(house => house.status_rumah === 'terjual').length : 0;
+                this.notSoldCount = Array.isArray(houses) ? houses.filter(house => house.status_rumah === 'deterjual').length : 0;
 
                 this.awaitingVerificationCount = Array.isArray(customers) ? customers.filter(customer => customer.verifikasi_data === false).length : 0;
                 this.verifiedCount = Array.isArray(customers) ? customers.filter(customer => customer.verifikasi_data === true).length : 0;

@@ -36,13 +36,13 @@
 </template>
 
 <script>
-import Api from "@/services/api"; // Assuming Api is set up for HTTP requests
+import Api from "@/services/api";
 
 export default {
     data() {
         return {
-            users: [], // Store the user list
-            isModalOpen: false, // Controls modal visibility
+            users: [],
+            isModalOpen: false,
             form: {
                 id: null,
                 username: "",
@@ -52,7 +52,7 @@ export default {
         };
     },
     created() {
-        this.fetchUsers(); // Fetch users on component creation
+        this.fetchUsers();
     },
     methods: {
         async fetchUsers() {
@@ -67,7 +67,7 @@ export default {
             if (confirm("Are you sure you want to delete this user?")) {
                 try {
                     await Api.delete(`/users/${userId}`);
-                    this.fetchUsers(); // Refetch the user list after deletion
+                    this.fetchUsers();
                 } catch (error) {
                     console.error("Error deleting user", error);
                 }

@@ -3,6 +3,7 @@
         <div class="mb-4 flex space-x-4">
             <select v-model="selectedBlokname" class="border-2 border-black px-4 py-2 flex-grow">
                 <option disabled value="">Pilih Blok</option>
+                <option value="semua">Semua</option>
                 <option v-for="blok in blokOptions" :key="blok._id.$oid" :value="blok.blokname"
                     class="font-bold font-Jet capitalize tracking-wide">
                     {{ blok.blokname }}
@@ -61,7 +62,7 @@
 
 <script>
 import CustomerService from "@/services/custumerApi";
-
+import Swal from 'sweetalert2';
 export default {
     data() {
         return {
@@ -128,6 +129,30 @@ export default {
         this.fetchCustomers();
     },
     methods: {
+        showAlert(message, type = 'info') {
+            Swal.fire({
+                title: 'Information',
+                text: message,
+                icon: type,
+                confirmButtonText: 'OK',
+            });
+        },
+        showSuccessAlert(message) {
+            Swal.fire({
+                title: 'Success',
+                text: message,
+                icon: 'success',
+                confirmButtonText: 'Ok!',
+            });
+        },
+        showErrorAlert(message) {
+            Swal.fire({
+                title: 'Error',
+                text: message,
+                icon: 'error',
+                confirmButtonText: 'Ok!',
+            });
+        },
         async fetchCustomers() {
             try {
                 const response = await CustomerService.getAll();
@@ -149,21 +174,24 @@ export default {
         },
         searchCustomer() {
             this.customers = [];
-
+            if (this.selectedBlokname == 'semua') {
+                this.fetchCustomers();
+                return;
+            }
             if (this.selectedBlokname.length > 0) {
                 CustomerService.searchCustomerByBlokname(this.selectedBlokname)
                     .then(res => {
                         if (res.data.data.length > 0) {
                             this.customers = res.data.data;
                         } else {
-                            alert(`Tidak ada customer di blok ${this.selectedBlokname}`);
+                            this.showAlert(`Tidak ada customer di blok ${this.selectedBlokname}`);
                         }
                     })
                     .catch(error => {
                         console.log(error);
                     });
             } else {
-                alert('Pilih nama blok untuk melakukan pencarian.');
+                this.showAlert('Pilih nama blok untuk melakukan pencarian.');
             }
         },
     },

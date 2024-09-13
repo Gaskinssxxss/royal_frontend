@@ -50,6 +50,8 @@ export default {
                         await this.$router.push("/admin");
                     } else if (this.userRole === "marketing") {
                         await this.$router.push("/marketing");
+                    } else if (this.userRole === "keuangan") {
+                        await this.$router.push("/keuanganDashboard");
                     } else {
                         await this.$router.push("/login");
                     }

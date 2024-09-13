@@ -30,8 +30,6 @@
         <div v-else>
             <p>No users found.</p>
         </div>
-
-        <!-- Modal -->
         <div v-if="isModalOpen" class="fixed z-10 inset-0 overflow-y-auto">
             <div class="flex items-center justify-center min-h-screen px-4">
                 <div class="fixed inset-0 bg-gray-600 bg-opacity-75"></div>
@@ -79,7 +77,7 @@
 
 <script>
 import Api from "@/services/api";
-
+import Swal from 'sweetalert2';
 export default {
     data() {
         return {
@@ -97,6 +95,30 @@ export default {
         this.fetchUsers();
     },
     methods: {
+        showAlert(message, type = 'info') {
+            Swal.fire({
+                title: 'Information',
+                text: message,
+                icon: type,
+                confirmButtonText: 'OK',
+            });
+        },
+        showSuccessAlert(message) {
+            Swal.fire({
+                title: 'Success',
+                text: message,
+                icon: 'success',
+                confirmButtonText: 'Ok!',
+            });
+        },
+        showErrorAlert(message) {
+            Swal.fire({
+                title: 'Error',
+                text: message,
+                icon: 'error',
+                confirmButtonText: 'Ok!',
+            });
+        },
         async fetchUsers() {
             try {
                 const response = await Api.get("/users/marketing");
@@ -117,7 +139,7 @@ export default {
         },
         async submitEdit() {
             if (this.form.password !== this.form.confirmPassword) {
-                alert("Passwords do not match!");
+                this.showErrorAlert("Passwords do not match!");
                 return;
             }
             try {
@@ -125,7 +147,7 @@ export default {
                     username: this.form.username,
                     password: this.form.password,
                 });
-                alert("User updated successfully");
+                this.showSuccessAlert("User updated successfully");
                 this.closeModal();
                 this.fetchUsers();
             } catch (error) {
@@ -135,5 +157,4 @@ export default {
     },
 };
 </script>
-
 <style scoped></style>

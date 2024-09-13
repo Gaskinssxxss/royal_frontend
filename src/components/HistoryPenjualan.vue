@@ -1,17 +1,15 @@
 <template>
     <div class="relative w-full h-screen p-4 bg-gray-100">
-        <!-- Customer List -->
         <div v-if="customers.length > 0">
-            <h2 class="text-lg font-semibold mb-4">Customer List</h2>
-            <table class="min-w-full border-collapse border-2 border-black text-center">
+            <table class="min-w-full border-collapse border-2 border-black text-center text-lg">
                 <thead>
                     <tr>
-                        <th class="border-2 border-black px-2 py-2">Nama Lengkap</th>
-                        <th class="border-2 border-black px-2 py-2">Blok Rumah</th>
-                        <th class="border-2 border-black px-2 py-2">No Rumah</th>
-                        <th class="border-2 border-black px-2 py-2">No Kontak</th>
-                        <th class="border-2 border-black px-2 py-2">Tipe Pembayaran</th>
-                        <th class="border-2 border-black px-2 py-2">Aksi</th>
+                        <th class="border-2 border-black px-2 py-2 font-normal">Nama Lengkap</th>
+                        <th class="border-2 border-black px-2 py-2 font-normal">Blok Rumah</th>
+                        <th class="border-2 border-black px-2 py-2 font-normal">No Rumah</th>
+                        <th class="border-2 border-black px-2 py-2 font-normal">No Kontak</th>
+                        <th class="border-2 border-black px-2 py-2 font-normal">Tipe Pembayaran</th>
+                        <th class="border-2 border-black px-2 py-2 font-normal">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -32,18 +30,17 @@
             </table>
         </div>
 
-        <!-- No Customers Message -->
+
         <div v-else>
             <p class="text-center">No customers found.</p>
         </div>
 
-        <!-- Edit Customer Data Modal -->
         <div v-if="isCustomerModalVisible"
             class="fixed inset-0 flex items-center justify-center z-30 bg-black bg-opacity-50">
             <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-3xl h-4/5 overflow-y-auto">
-                <h2 class="text-lg font-semibold mb-4">Form Customer Data</h2>
+                <h2 class="text-lg font-normal mb-4">Form Customer Data</h2>
                 <form @submit.prevent="submitCustomerForm">
-                    <!-- Blok and No Rumah -->
+
                     <div class="mb-4">
                         <label class="block text-sm font-medium mb-1">Blok:</label>
                         <p>{{ customerForm.blokname }}</p>
@@ -53,8 +50,8 @@
                         <p>{{ customerForm.no_rumah }}</p>
                     </div>
 
-                    <!-- Kavling Section -->
-                    <h3 class="text-lg font-semibold mb-2">Kavling</h3>
+
+                    <h3 class="text-lg font-normal mb-2">Kavling</h3>
                     <div class="grid grid-cols-2 gap-4 mb-4">
                         <div>
                             <label class="block text-sm font-medium mb-1">No Kavling:</label>
@@ -74,8 +71,8 @@
                         </div>
                     </div>
 
-                    <!-- Data Pribadi Section -->
-                    <h3 class="text-lg font-semibold mb-2">Data Pribadi</h3>
+
+                    <h3 class="text-lg font-normal mb-2">Data Pribadi</h3>
                     <div class="grid grid-cols-2 gap-4 mb-4">
                         <div>
                             <label class="block text-sm font-medium mb-1">Nama Lengkap:</label>
@@ -131,8 +128,8 @@
                         </div>
                     </div>
 
-                    <!-- Pekerjaan Section -->
-                    <h3 class="text-lg font-semibold mb-2">Pekerjaan</h3>
+
+                    <h3 class="text-lg font-normal mb-2">Pekerjaan</h3>
                     <div class="grid grid-cols-2 gap-4 mb-4">
                         <div>
                             <label class="block text-sm font-medium mb-1">Jenis Pekerjaan:</label>
@@ -180,13 +177,12 @@
                         </div>
                     </div>
 
-                    <!-- Customer Files Section -->
 
-                    <h3 class="text-lg font-semibold mb-2">Type Pembayaran</h3>
+                    <h3 class="text-lg font-normal mb-2">Type Pembayaran</h3>
                     <div>
                         <p>{{ customerForm.type_pembayaran }}</p>
                     </div>
-                    <h4 class="text-lg font-semibold mb-2">Customer Files</h4>
+                    <h4 class="text-lg font-normal mb-2">Customer Files</h4>
                     <div class="grid grid-cols-2 gap-4 mb-4">
                         <div>
                             <label class="block text-sm font-medium mb-1">KTP:</label>
@@ -226,12 +222,11 @@
                         </div>
                     </div>
 
-                    <!-- Submit Button -->
+
                     <div class="flex justify-end space-x-4">
                         <button type="button" @click="closeCustomerModal"
                             class="px-4 py-2 bg-gray-500 text-white rounded-lg">Close</button>
-                        <!-- <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg">Submit &
-                            Lanjutkan</button> -->
+
                     </div>
                 </form>
             </div>
@@ -246,11 +241,11 @@ import houseApi from "@/services/houseApi.js"
 export default {
     data() {
         return {
-            customers: [], // List of customers
-            isCustomerModalVisible: false, // Controls modal visibility
-            bloks: [], // List of blok
-            houses: [], // List of houses
-            filteredHouses: [], // Houses filtered by blok
+            customers: [],
+            isCustomerModalVisible: false,
+            bloks: [],
+            houses: [],
+            filteredHouses: [],
             customerForm: {
                 id_blok: "",
                 id_rumah: "",
@@ -335,14 +330,12 @@ export default {
             this.filteredHouses = this.houses.filter(
                 (house) => house.id_blok._id === this.customerForm.id_blok
             );
-            //console.log(this.filteredHouses);
         },
 
         async fetchCustomers() {
             try {
                 const response = await CustomerService.getVerifiedCustomers();
                 this.customers = response.data.data;
-                // console.log(this.customers);
             } catch (error) {
                 console.error("Error fetching customers:", error);
             }

@@ -7,6 +7,9 @@ export default {
   getById(id) {
     return Api.get(`/keuangan/${id}`);
   },
+  getKeuanganCustumerById(id) {
+    return Api.get(`/keuangan/customer/${id}`);
+  },
   create(data) {
     return Api.post("/keuangan", data);
   },

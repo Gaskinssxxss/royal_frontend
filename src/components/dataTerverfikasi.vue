@@ -3,6 +3,7 @@
         <div class="mb-4 flex space-x-4">
             <select v-model="selectedBlokname" class="border-2 border-black px-4 py-2 flex-grow">
                 <option disabled value="">Pilih Blok</option>
+                <option value="semua">Semua</option>
                 <option v-for="blok in blokOptions" :key="blok._id.$oid" :value="blok.blokname"
                     class="font-bold font-Jet capitalize tracking-wide">
                     {{ blok.blokname }}
@@ -331,7 +332,7 @@
 <script>
 import custumerApi from '@/services/custumerApi';
 import VueEasyLightbox from 'vue-easy-lightbox';
-
+import Swal from 'sweetalert2';
 export default {
     components: {
         VueEasyLightbox
@@ -407,6 +408,30 @@ export default {
         this.getUnverifiedCustomers();
     },
     methods: {
+        showAlert(message, type = 'info') {
+            Swal.fire({
+                title: 'Information',
+                text: message,
+                icon: type,
+                confirmButtonText: 'OK',
+            });
+        },
+        showSuccessAlert(message) {
+            Swal.fire({
+                title: 'Success',
+                text: message,
+                icon: 'success',
+                confirmButtonText: 'Ok!',
+            });
+        },
+        showErrorAlert(message) {
+            Swal.fire({
+                title: 'Error',
+                text: message,
+                icon: 'error',
+                confirmButtonText: 'Ok!',
+            });
+        },
         openModal(id, page) {
             this.selectedId = id;
             this.modalPage = page;
@@ -430,26 +455,26 @@ export default {
         async verifyCustomer(id) {
             custumerApi.cancelVerificationStatus(id)
                 .then(() => {
-                    alert('Batalkan Verifikasi Berhasil');
+                    this.showSuccessAlert('Batalkan Verifikasi Berhasil');
                     this.getUnverifiedCustomers();
                     this.closeModal();
                     window.location.reload()
                 })
                 .catch((error) => {
                     console.error('Verifikasi gagal', error);
-                    alert('Verifikasi gagal, coba lagi.');
+                    this.showErrorAlert('Verifikasi gagal, coba lagi.');
                 });
         },
         async deterjual(houseId) {
             custumerApi.deupdateHouseStatus(houseId)
                 .then(() => {
-                    alert('Status rumah berhasil diperbarui menjadi tidak terjual');
+                    this.showSuccessAlert('Status rumah berhasil diperbarui menjadi tidak terjual');
                     this.getUnverifiedCustomers();
                     this.closeModal();
                 })
                 .catch(error => {
                     console.error('Gagal memperbarui status rumah', error);
-                    alert('Gagal memperbarui status rumah');
+                    this.showErrorAlert('Gagal memperbarui status rumah');
                 });
         },
         terjuals() {
@@ -458,32 +483,35 @@ export default {
         terjual(houseId, kondisi) {
             custumerApi.updateHouseStatus(houseId, kondisi)
                 .then(() => {
-                    alert('Status rumah berhasil diperbarui menjadi terjual');
+                    this.showSuccessAlert('Status rumah berhasil diperbarui menjadi terjual');
                     this.getUnverifiedCustomers();
                     this.closeModal();
                 })
                 .catch(error => {
                     console.error('Gagal memperbarui status rumah', error);
-                    alert('Gagal memperbarui status rumah');
+                    this.showErrorAlert('Gagal memperbarui status rumah');
                 });
         },
         searchCustomer() {
             this.customer = [];
-
+            if (this.selectedBlokname == 'semua') {
+                this.getUnverifiedCustomers();
+                return;
+            }
             if (this.selectedBlokname.length > 0) {
                 custumerApi.searchCustomerByBlokname(this.selectedBlokname)
                     .then(res => {
                         if (res.data.data.length > 0) {
                             this.customer = res.data.data;
                         } else {
-                            alert(`Tidak ada customer di blok ${this.selectedBlokname}`);
+                            this.showAlert(`Tidak ada customer di blok ${this.selectedBlokname}`);
                         }
                     })
                     .catch(error => {
                         console.log(error);
                     });
             } else {
-                alert('Pilih nama blok untuk melakukan pencarian.');
+                this.showAlert('Pilih nama blok untuk melakukan pencarian.');
             }
         },
         getFullImgPath(img) {

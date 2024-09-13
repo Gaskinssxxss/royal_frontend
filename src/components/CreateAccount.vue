@@ -23,6 +23,7 @@
                 <label class="block text-black">Role</label>
                 <select v-model="form.role" class="w-full px-4 py-2 border border-black rounded">
                     <option value="marketing">Marketing</option>
+                    <option value="keuangan">Keuangan</option>
                 </select>
             </div>
             <div class="flex justify-end">
@@ -78,18 +79,16 @@ export default {
                 username: '',
                 email: '',
                 password: '',
-                role: 'marketing', // Default role
+                role: '',
             },
-            isModalOpen: false, // State for modal
+            isModalOpen: false,
         };
     },
     methods: {
         openModal() {
-            // Open confirmation modal before submitting the form
             this.isModalOpen = true;
         },
         closeModal() {
-            // Close the confirmation modal
             this.isModalOpen = false;
         },
         async createAccount() {
@@ -103,9 +102,9 @@ export default {
                     username: '',
                     email: '',
                     password: '',
-                    role: 'marketing',
+                    role: '',
                 };
-                this.closeModal(); // Close modal after success
+                this.closeModal();
             } catch (error) {
                 console.error("Error creating account", error);
             }

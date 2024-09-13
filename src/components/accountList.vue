@@ -33,8 +33,6 @@
         <div v-else>
             <p>No marketing accounts found.</p>
         </div>
-
-        <!-- Modal -->
         <div v-if="isModalOpen" class="fixed z-10 inset-0 overflow-y-auto">
             <div class="flex items-center justify-center min-h-screen px-4">
                 <div class="fixed inset-0 bg-gray-600 bg-opacity-75 transition-opacity"></div>

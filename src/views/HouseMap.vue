@@ -43,8 +43,8 @@
               <td class="px-4 py-2 border-2 border-black">{{ customer.kavling[0].luas_bangunan }}</td>
               <td class="px-4 py-2 border-2 border-black">{{ customer.kavling[0].luas_tanah }}</td>
               <td class="px-4 py-2 border-2 border-black">
-                <button @click="openTicketModal(customer)" class="px-4 py-2 bg-blue-500 text-white rounded-lg">
-                  Buat Tiket
+                <button @click="tanyaAdmin(customer)" class="px-4 py-2 bg-blue-500 text-white rounded-lg">
+                  Chat
                 </button>
               </td>
             </tr>
@@ -81,8 +81,8 @@
               <td class="px-4 py-2 border-2 border-black">{{ customer.kavling[0].luas_bangunan }}</td>
               <td class="px-4 py-2 border-2 border-black">{{ customer.kavling[0].luas_tanah }}</td>
               <td class="px-4 py-2 border-2 border-black">
-                <button @click="openTicketModal(customer)" class="px-4 py-2 bg-blue-500 text-white rounded-lg">
-                  Buat Tiket
+                <button @click="tanyaAdmin(customer)" class="px-4 py-2 bg-blue-500 text-white rounded-lg">
+                  Chat
                 </button>
               </td>
             </tr>
@@ -92,25 +92,6 @@
     </div>
     <div v-else>
       <p class="text-end">Belum ada riwayat.</p>
-    </div>
-
-    <div v-if="isTicketModalVisible" class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-      <div class="bg-white p-6 rounded-lg shadow-lg w-96">
-        <h2 class="text-lg font-semibold mb-4">Buat Tiket untuk {{ selectedCustomer.data_pribadi[0].namaLengkap }}
-        </h2>
-        <form @submit.prevent="submitTicket">
-          <div class="mb-4">
-            <label class="block text-sm font-medium mb-1">Isi Tiket</label>
-            <textarea v-model="ticketContent" class="w-full p-2 border border-gray-300 rounded-lg"
-              placeholder="Masukkan isi tiket"></textarea>
-          </div>
-          <div class="flex justify-end space-x-4">
-            <button @click="closeTicketModal" type="button"
-              class="px-4 py-2 bg-gray-500 text-white rounded-lg">Batal</button>
-            <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg">Kirim</button>
-          </div>
-        </form>
-      </div>
     </div>
 
     <div v-if="isModalVisible" class="fixed inset-0 flex items-center justify-center z-30 bg-black bg-opacity-50">
@@ -152,8 +133,13 @@
     <div v-if="isCustomerModalVisible"
       class="fixed inset-0 flex items-center justify-center z-30 bg-black bg-opacity-50">
       <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-3xl h-4/5 overflow-y-auto">
-        <h2 class="text-lg font-semibold mb-4">Form Customer Data</h2>
+        <h1 class="text-lg font-semibold mb-4">Form Customer Data</h1>
         <form @submit.prevent="submitCustomerForm">
+          <div>
+            <label class="block text-sm font-medium mb-1">No STR</label>
+            <input v-model="customerForm.nomor_str" type="text" required
+              class="w-50 p-2 border border-gray-300 rounded-lg" />
+          </div>
           <div class="mb-4">
             <label class="block text-sm font-medium mb-1">Blok</label>
             <select v-model="customerForm.id_blok" required class="w-full p-2 border border-gray-300 rounded-lg">
@@ -395,6 +381,7 @@ import svgPanZoom from 'svg-pan-zoom';
 import houseApi from '@/services/houseApi';
 import blokApi from '@/services/blokApi';
 import custumerApi from '@/services/custumerApi';
+import Swal from 'sweetalert2';
 
 export default {
 
@@ -420,6 +407,7 @@ export default {
         id_blok: '',
         id_rumah: '',
         type_pembayaran: '',
+        nomor_str: 'HUHBSA2',
         kavling: {
           no_kavling: 'A12',
           type: 'Type 36',
@@ -477,9 +465,12 @@ export default {
     this.getUserHistory()
   },
   methods: {
-    openTicketModal(customer) {
+    async tanyaAdmin(customer) {
       this.selectedCustomer = customer;
-      this.isTicketModalVisible = true;
+      const message = `Marketing : ${customer.id_user.username} - Blok : ${customer.id_blok.blokname} - 
+      No Rumah : ${customer.id_rumah.no_rumah} - Tipe : ${customer.id_rumah.type_rumah}`;
+      const encodedMessage = btoa(message); // Encode the message to Base64
+      await this.$router.push({ path: '/live-chat', query: { message: encodedMessage } });
     },
     closeTicketModal() {
       this.isTicketModalVisible = false;
@@ -608,6 +599,30 @@ export default {
       path.classList.remove('stroke-yellow-500');
       this.tooltipVisible = false;
     },
+    showAlert(message, type = 'info') {
+      Swal.fire({
+        title: 'Information',
+        text: message,
+        icon: type,
+        confirmButtonText: 'OK',
+      });
+    },
+    showSuccessAlert(message) {
+      Swal.fire({
+        title: 'Success',
+        text: message,
+        icon: 'success',
+        confirmButtonText: 'Ok!',
+      });
+    },
+    showErrorAlert(message) {
+      Swal.fire({
+        title: 'Error',
+        text: message,
+        icon: 'error',
+        confirmButtonText: 'Ok!',
+      });
+    },
     handleClick(id, house) {
       this.selectedId = id;
 
@@ -617,16 +632,16 @@ export default {
         this.closeModal();
         this.loadHouseData(id, house.id_blok);
       } else if (house && house.status_rumah === "terjual") {
-        alert('Rumah Sudah Terjual');
+        this.showAlert('Rumah Sudah Terjual', 'info');
         this.closeModal();
       } else if (house && house.status_rumah === "cash") {
-        alert('Rumah Sudah Terjual Cash');
+        this.showAlert('Rumah Sudah Terjual Cash', 'info');
         this.closeModal();
       } else if (house && house.status_rumah === "terbooking") {
-        alert('Rumah Sudah Terjual');
+        this.showAlert('Rumah Sudah Terjual', 'info');
         this.closeModal();
       } else if (house && house.status_rumah === "kpr") {
-        alert('Rumah Dalam Kpr');
+        this.showAlert('Rumah Dalam KPR', 'info');
         this.closeModal();
       }
     },
@@ -679,7 +694,7 @@ export default {
         formData.append("id_blok", this.customerForm.id_blok);
         formData.append("id_rumah", this.customerForm.id_rumah);
         formData.append("type_pembayaran", this.customerForm.type_pembayaran)
-
+        formData.append("nomor_str", this.customerForm.nomor_str)
         if (!this.customerForm.kavling) {
           throw new Error("Data Kavling wajib diisi.");
         }
@@ -708,11 +723,12 @@ export default {
             "Content-Type": "multipart/form-data"
           }
         });
-
-        this.$toast.success("Form berhasil dikirim!");
+        this.showSuccessAlert('Form berhasil dikirim!');
+        // this.$toast.success("Form berhasil dikirim!");
         this.closeCustomerModal();
       } catch (error) {
-        this.$toast.error(error.message || "Terjadi kesalahan saat mengirim form.");
+        this.showErrorAlert('Form gagal dikirim!');
+        // this.$toast.error(error.message || "Terjadi kesalahan saat mengirim form.");
         console.error(error);
       }
     }

@@ -27,65 +27,16 @@
                         <h1 class="pl-2 uppercase">Dashboard</h1>
                     </button>
                 </div>
-                <div @click="live" :class="{ 'bg-red-500': isClick.live }"
+                <div @click="keuanganPage" :class="{ 'bg-red-500': isClick.kp }"
                     class="hover:bg-gray-200 hover:border hover:border-gray-200">
                     <button>
-                        <h1 class="pl-2 uppercase">Live Chat</h1>
+                        <h1 class="pl-2 uppercase">Pembayaran</h1>
                     </button>
                 </div>
-                <div @click="verifikasi" :class="{ 'bg-red-500': isClick.verifikasi }"
-                    class="hover:bg-gray-200 hover:border hover:border-gray-200 flex space-x-2">
-                    <div>
-                        <button>
-                            <h1 class="pl-2 uppercase">Verifikasi Data</h1>
-                        </button>
-                    </div>
-                    <div class="bg-che text-gray-200 border-2 border-black rounded-full text-base -mt-1">
-                        <h1 class="px-3 pt-0.5">
-                            {{ nilai }}
-                        </h1>
-                    </div>
-                </div>
-                <div @click="checklist" :class="{ 'bg-red-500': isClick.terverifikasi }"
+                <div @click="ProgresBar" :class="{ 'bg-red-500': isClick.pg }"
                     class="hover:bg-gray-200 hover:border hover:border-gray-200">
                     <button>
-                        <h1 class="pl-2 uppercase">Data Terverifikasi</h1>
-                    </button>
-                </div>
-                <div @click="edit" :class="{ 'bg-red-500': isClick.edit }"
-                    class="hover:bg-gray-200 hover:border hover:border-gray-200">
-                    <button>
-                        <h1 class="pl-2 uppercase">Edit Data</h1>
-                    </button>
-                </div>
-                <div @click="deleted" :class="{ 'bg-red-500': isClick.deleted }"
-                    class="hover:bg-gray-200 hover:border hover:border-gray-200">
-                    <button>
-                        <h1 class="pl-2 uppercase">Hapus Data</h1>
-                    </button>
-                </div>
-                <div @click="listaccount" :class="{ 'bg-red-500': isClick.listaccount }"
-                    class="hover:bg-gray-200 hover:border hover:border-gray-200">
-                    <button>
-                        <h1 class="pl-2 uppercase">Verifikasi Akun</h1>
-                    </button>
-                </div>
-                <div @click="CreateAccount" :class="{ 'bg-red-500': isClick.creataccount }"
-                    class="hover:bg-gray-200 hover:border hover:border-gray-200">
-                    <button>
-                        <h1 class="pl-2 uppercase">Buat Akun</h1>
-                    </button>
-                </div>
-                <div @click="Editaccount" :class="{ 'bg-red-500': isClick.editaccount }"
-                    class="hover:bg-gray-200 hover:border hover:border-gray-200">
-                    <button>
-                        <h1 class="pl-2 uppercase">Edit Akun</h1>
-                    </button>
-                </div>
-                <div @click="HapusAccount" :class="{ 'bg-red-500': isClick.deleteaccount }"
-                    class="hover:bg-gray-200 hover:border hover:border-gray-200">
-                    <button>
-                        <h1 class="pl-2 uppercase">Hapus Akun</h1>
+                        <h1 class="pl-2 uppercase">Progres Pembayaran </h1>
                     </button>
                 </div>
                 <div @click="historyPenjualan" :class="{ 'bg-red-500': isClick.historypenjualan }"
@@ -106,39 +57,16 @@
                     <div v-if="ds">
                         <dashboardSpez />
                     </div>
-                    <div v-if="vd">
-                        <verifikasiData />
-                    </div>
-                    <div v-if="dt">
-                        <dataTerverfikasi />
-                    </div>
-                    <div v-if="ed">
-                        <editData />
-                    </div>
-                    <div v-if="de">
-                        <deleteData />
-                    </div>
-                    <div v-if="lsaccount">
-                        <accountList />
-                    </div>
-                    <div v-if="createaccount">
-                        <CreateAccount />
-                    </div>
-                    <div v-if="editakun">
-                        <EditAccount />
-                    </div>
-                    <div v-if="deleteakun">
-                        <DeleteAccount />
-                    </div>
-                    <div v-if="tiketlist">
-                        <ticketList />
-                    </div>
-                    <div v-if="historypenjualan">
+                    <div v-if="hsp">
                         <HistoryPenjualan />
                     </div>
-                    <div v-if="adminlive">
-                        <adminLiveChat />
+                    <div v-if="kp">
+                        <keuanganPage />
                     </div>
+                    <div v-if="pg">
+                        <progresBar />
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -147,61 +75,30 @@
 
 <script>
 import dashboardSpez from '@/components/dashboardSpez.vue';
-import verifikasiData from '@/components/verifikasiData.vue';
-import editData from '@/components/editData.vue';
-import deleteData from '@/components/deleteData.vue';
-import dataTerverfikasi from '@/components/dataTerverfikasi.vue';
-import accountList from '@/components/accountList.vue';
-import CreateAccount from '@/components/CreateAccount.vue';
-import EditAccount from '@/components/EditAccount.vue';
-import DeleteAccount from '@/components/deleteAccount.vue';
-import custumerApi from '@/services/custumerApi';
-import ticketList from '@/components/ticketList.vue';
 import HistoryPenjualan from '@/components/HistoryPenjualan.vue';
-import adminLiveChat from '@/components/adminLiveChat.vue';
-
+import progresBar from '@/components/progresBar.vue';
+import custumerApi from '@/services/custumerApi';
+import keuanganPage from '@/components/keuanganPage.vue';
 export default {
     components: {
         dashboardSpez,
-        verifikasiData,
-        editData,
-        deleteData,
-        dataTerverfikasi,
-        accountList,
-        CreateAccount,
-        EditAccount,
-        DeleteAccount,
-        ticketList,
         HistoryPenjualan,
-        adminLiveChat
+        keuanganPage,
+        progresBar
     },
     data() {
         return {
             isClick: {
                 dashboard: true,
                 verifikasi: false,
-                edit: false,
-                deleted: false,
-                terverifikasi: false,
-                listaccount: false,
-                creataccount: false,
-                editaccount: false,
-                deleteaccount: false,
-                LogOut: false,
-                tiketlist: false,
                 historypenjualan: false,
-                live: false
+                kp: false,
+                pg: false,
             },
             ds: true,
-            vd: false,
-            ed: false,
-            de: false,
-            dt: false,
-            lsaccount: false,
-            createaccount: false,
-            editakun: false,
-            deleteakun: false,
-            tiketlist: false,
+            hsp: false,
+            kp: false,
+            pg: false,
             historypenjualan: false,
             nilai: 0,
             adminlive: false
@@ -216,21 +113,21 @@ export default {
         this.getUnverifiedCustomers()
     },
     methods: {
-        live() {
+        keuanganPage() {
             this.resets()
-            this.adminlive = true;
-            this.isClick.adminlive = true
+            this.kp = true;
+            this.isClick.kp = true
         },
         historyPenjualan() {
             this.resets();
-            this.historypenjualan = true;
+            this.hsp = true;
             this.isClick.historypenjualan = true;
 
         },
-        TicketReques() {
+        ProgresBar() {
             this.resets();
-            this.isClick.tiketlist = true
-            this.tiketlist = true;
+            this.isClick.pg = true
+            this.pg = true;
         },
         getUnverifiedCustomers() {
             custumerApi.getUnverifiedCustomers()
@@ -301,6 +198,12 @@ export default {
             this.historypenjualan = false;
             this.isClick.historypenjualan = false;
             this.isClick.live = false
+            this.hsp = false;
+            this.isClick.historypenjualan = false;
+            this.kp = false;
+            this.isClick.kp = false;
+            this.isClick.pg = false
+            this.pg = false;
         },
         deleted() {
             this.resets();

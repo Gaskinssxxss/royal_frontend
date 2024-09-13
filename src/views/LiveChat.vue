@@ -44,7 +44,7 @@
 <script>
 import api from '@/services/api';
 import io from 'socket.io-client';
-
+import Swal from 'sweetalert2';
 export default {
     data() {
         return {
@@ -66,6 +66,30 @@ export default {
     },
 
     methods: {
+        showAlert(message, type = 'info') {
+            Swal.fire({
+                title: 'Information',
+                text: message,
+                icon: type,
+                confirmButtonText: 'OK',
+            });
+        },
+        showSuccessAlert(message) {
+            Swal.fire({
+                title: 'Success',
+                text: message,
+                icon: 'success',
+                confirmButtonText: 'Ok!',
+            });
+        },
+        showErrorAlert(message) {
+            Swal.fire({
+                title: 'Error',
+                text: message,
+                icon: 'error',
+                confirmButtonText: 'Ok!',
+            });
+        },
         generateNewVisitorID() {
             this.visitorID = generateVisitorID();
             localStorage.setItem('visitorID', this.visitorID);
@@ -99,7 +123,7 @@ export default {
             });
 
             this.socket.on('chatClosed', (msg) => {
-                alert(msg.message);
+                this.showAlert(msg.message);
                 this.chatClosed = true;
             });
         },
@@ -128,7 +152,7 @@ export default {
                 .catch((error) => {
                     console.error('Error closing chat:', error.response ? error.response.data : error.message);
                 });
-            this.$router.push('/')
+            this.$router.push('/marketing')
         }
     },
     beforeUnmount() {
