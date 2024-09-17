@@ -28,6 +28,7 @@
                             <th class="border-2 border-black px-2 py-2 font-normal">Nama Blok</th>
                             <th class="border-2 border-black px-2 py-2 font-normal">Nomor Rumah</th>
                             <th class="border-2 border-black px-2 py-2 font-normal">Tipe Rumah</th>
+                            <th class="border-2 border-black px-2 py-2 font-normal">Status rumah</th>
                             <th class="border-2 border-black px-2 py-2 font-normal">Status</th>
                             <th class="border-2 border-black px-2 py-2 font-normal">Aksi</th>
                         </tr>
@@ -41,6 +42,7 @@
                             <td class="border-2 border-black px-2 py-2">{{ custom.id_blok.blokname }}</td>
                             <td class="border-2 border-black px-2 py-2">{{ custom.id_rumah.no_rumah }}</td>
                             <td class="border-2 border-black px-2 py-2">{{ custom.id_rumah.type_rumah }}</td>
+                            <td class="border-2 border-black px-2 py-2">{{ custom.id_rumah.status_rumah }}</td>
                             <div v-if="custom.verifikasi_data === true">
                                 <td class="px-2 pt-5 text-marydeep">Terverifikasi</td>
                             </div>
@@ -66,7 +68,7 @@
 
                 <div v-for="custom in customer" :key="custom._id">
                     <div v-if="showData && selectedId === custom._id && modalPage === 1"
-                        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40">
                         <div class="bg-white rounded-lg shadow-xl p-6 max-w-2xl w-full relative">
                             <button @click="closeModal"
                                 class="absolute top-2 right-2 text-gray-600 hover:text-black">✖</button>
@@ -117,11 +119,10 @@
                     </div>
 
                     <div v-if="showData && selectedId === custom._id && modalPage === 2"
-                        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40">
                         <div class="bg-white rounded-lg shadow-xl p-6 max-w-2xl w-full relative">
                             <button @click="closeModal"
                                 class="absolute top-2 right-2 text-gray-600 hover:text-black">✖</button>
-
                             <h2 class="text-xl font-normal mb-4">Data Pribadi</h2>
                             <table class="min-w-full border-collapse border border-gray-300">
                                 <tbody>
@@ -177,7 +178,7 @@
                     </div>
 
                     <div v-if="showData && selectedId === custom._id && modalPage === 3"
-                        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40">
                         <div class="bg-white rounded-lg shadow-xl p-6 max-w-2xl w-full relative">
                             <button @click="closeModal"
                                 class="absolute top-2 right-2 text-gray-600 hover:text-black">✖</button>
@@ -233,7 +234,7 @@
                     </div>
 
                     <div v-if="showData && selectedId === custom._id && modalPage === 4"
-                        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40">
                         <div class="bg-white rounded-lg shadow-xl p-6 max-w-2xl w-auto relative">
                             <button @click="closeModal"
                                 class="absolute top-2 right-2 text-gray-600 hover:text-black">✖</button>
@@ -278,26 +279,30 @@
                                 </tbody>
                             </table>
 
-                            <div v-if="shows" class="inset-0 h-screen z-50 flex justify-center items-center">
-                                <div>
-                                    <div>
-                                        <select v-model="kondisis">
-                                            <option value="terjual">terjual</option>
-                                            <option value="terbooking">terbooking</option>
-                                            <option value="cash">cash</option>
-                                            <option value="kpr">kpr</option>
+                            <div v-if="shows"
+                                class="fixed inset-0 h-screen z-50 flex justify-center items-center bg-black bg-opacity-50">
+                                <div class="relative bg-white p-6 rounded-lg shadow-lg w-96">
+                                    <button @click="shows = false"
+                                        class="absolute top-2 right-2 text-gray-600 hover:text-black">
+                                        ✖
+                                    </button>
+                                    <div class="mb-4">
+                                        <select v-model="kondisis"
+                                            class="border-2 border-gray-300 rounded w-full px-4 py-2">
+                                            <option value="terjual">Terjual</option>
+                                            <option value="terbooking">Terbooking</option>
+                                            <option value="cash">Cash</option>
+                                            <option value="kpr">KPR</option>
                                         </select>
                                     </div>
-                                </div>
-                                <div>
-                                    <button @click="terjual(custom.id_rumah._id, kondisis)">
-                                        <h1>
-                                            sukses
-                                        </h1>
-                                    </button>
+                                    <div class="flex justify-center">
+                                        <button @click="terjual(custom.id_rumah._id, kondisis)"
+                                            class="bg-gray-200 border-2 border-black text-black px-4 py-2 rounded transition-transform transform -translate-x-1 -translate-y-1 hover:-translate-x-2 hover:-translate-y-2">
+                                            Simpan
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-
                             <div class="mt-4 flex justify-between">
                                 <div class="bg-black">
                                     <button @click="changeModalPage(3)"
@@ -455,10 +460,9 @@ export default {
         async verifyCustomer(id) {
             custumerApi.cancelVerificationStatus(id)
                 .then(() => {
-                    this.showSuccessAlert('Batalkan Verifikasi Berhasil');
+                    this.showSuccessAlert('Batalkan Verifikasi Berhasil. Status rumah berhasil diperbarui menjadi tidak terjual.');
                     this.getUnverifiedCustomers();
                     this.closeModal();
-                    window.location.reload()
                 })
                 .catch((error) => {
                     console.error('Verifikasi gagal', error);
@@ -468,8 +472,6 @@ export default {
         async deterjual(houseId) {
             custumerApi.deupdateHouseStatus(houseId)
                 .then(() => {
-                    this.showSuccessAlert('Status rumah berhasil diperbarui menjadi tidak terjual');
-                    this.getUnverifiedCustomers();
                     this.closeModal();
                 })
                 .catch(error => {
@@ -483,7 +485,16 @@ export default {
         terjual(houseId, kondisi) {
             custumerApi.updateHouseStatus(houseId, kondisi)
                 .then(() => {
-                    this.showSuccessAlert('Status rumah berhasil diperbarui menjadi terjual');
+                    if (kondisi === "terbooking") {
+                        this.showSuccessAlert('Status rumah berhasil diperbarui menjadi terbooking');
+                    } else if (kondisi === "terjual") {
+                        this.showSuccessAlert('Status rumah berhasil diperbarui menjadi terjual');
+                    } else if (kondisi === "cash") {
+                        this.showSuccessAlert('Status rumah berhasil diperbarui menjadi terjual cash');
+                    } else if (kondisi === "kpr") {
+                        this.showSuccessAlert('Status rumah berhasil diperbarui menjadi terjual kpr');
+                    }
+
                     this.getUnverifiedCustomers();
                     this.closeModal();
                 })
@@ -515,7 +526,7 @@ export default {
             }
         },
         getFullImgPath(img) {
-            return `http://192.168.1.4:3000/${img}`;
+            return `http://192.168.1.10:3000/${img}`;
         },
         openLightbox(image) {
             this.lightboxImages = [image];

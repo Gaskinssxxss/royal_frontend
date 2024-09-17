@@ -1,135 +1,48 @@
 <template>
-  <div class="relative w-full h-screen p-4 bg-gray-100">
-    <div class="flex justify-end">
-      <div @click="logout" class="mb-4">
-        <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-          Log Out
-        </button>
-      </div>
-    </div>
-
-    <div v-if="userHistory.length > 0" class="mb-6">
-      <div class="flex justify-end mb-4">
-        <div class="bg-black rounded">
-          <button @click="riwayat"
-            class="bg-gray-200 border-2 border-black rounded transition-transform duration-300 ease-linear transform -translate-x-1 -translate-y-1 hover:-translate-x-2 hover:-translate-y-2">
-            <h2 class="text-xl font-anton p-2">Riwayat Customer</h2>
+  <div>
+    <div v-if="showChoose" class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+      <div class="relative bg-white p-6 rounded-lg shadow-lg text-center">
+        <div class="absolute top-2 right-2">
+          <button @click="closed" class="text-gray-600 hover:text-black text-xl">✖</button>
+        </div>
+        <div class="mt-8 mb-4">
+          <button @click="bookHouse" class="px-4 py-2 bg-blue-500 text-white rounded-lg">
+            <h1>Booking</h1>
+          </button>
+        </div>
+        <div>
+          <button @click="forms" class="px-4 py-2 bg-green-500 text-white rounded-lg">
+            <h1>Isi Form</h1>
           </button>
         </div>
       </div>
-      <div v-if="userHistory.length > 1" class="h-40 overflow-y-auto absolute border-2 border-black right-0">
-        <table v-if="show" class="table-auto w-full border-2 border-black font-anton bg-gray-200">
-          <thead>
-            <tr class="bg-gray-200 text-left">
-              <th class="px-4 py-2 border-2 border-black font-normal">Blok</th>
-              <th class="px-4 py-2 border-2 border-black font-normal">No Rumah</th>
-              <th class="px-4 py-2 border-2 border-black font-normal">Status Verifikasi</th>
-              <th class="px-4 py-2 border-2 border-black font-normal">No Kavling</th>
-              <th class="px-4 py-2 border-2 border-black font-normal">Type Kavling</th>
-              <th class="px-4 py-2 border-2 border-black font-normal">Luas Bangunan</th>
-              <th class="px-4 py-2 border-2 border-black font-normal">Luas Tanah</th>
-              <th class="px-4 py-2 border-2 border-black font-normal">Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="customer in userHistory" :key="customer._id" class="border-b">
-              <td class="px-4 py-2 border-2 border-black">{{ customer.id_blok.blokname }}</td>
-              <td class="px-4 py-2 border-2 border-black">{{ customer.id_rumah.no_rumah }}</td>
-              <td class="px-4 py-2 border-2 border-black">
-                {{ customer.verifikasi_data ? 'Terverifikasi' : 'Belum Terverifikasi' }}
-              </td>
-              <td class="px-4 py-2 border-2 border-black">{{ customer.kavling[0].no_kavling }}</td>
-              <td class="px-4 py-2 border-2 border-black">{{ customer.kavling[0].type }}</td>
-              <td class="px-4 py-2 border-2 border-black">{{ customer.kavling[0].luas_bangunan }}</td>
-              <td class="px-4 py-2 border-2 border-black">{{ customer.kavling[0].luas_tanah }}</td>
-              <td class="px-4 py-2 border-2 border-black">
-                <button @click="tanyaAdmin(customer)" class="px-4 py-2 bg-blue-500 text-white rounded-lg">
-                  Chat
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div v-else-if="userHistory.length < 2">
-        <table v-if="show" class="table-auto w-full border-2 border-black font-anton text-xl">
-          <thead>
-            <tr class="bg-gray-200 text-left">
-              <th class="px-4 py-2 border-2 border-black font-normal">Blok</th>
-              <th class="px-4 py-2 border-2 border-black font-normal">No Rumah</th>
-              <th class="px-4 py-2 border-2 border-black font-normal">Status Verifikasi</th>
-              <th class="px-4 py-2 border-2 border-black font-normal">No Kavling</th>
-              <th class="px-4 py-2 border-2 border-black font-normal">Type Kavling</th>
-              <th class="px-4 py-2 border-2 border-black font-normal">Luas Bangunan</th>
-              <th class="px-4 py-2 border-2 border-black font-normal">Luas Tanah</th>
-              <th class="px-4 py-2 border-2 border-black font-normal">Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="customer in userHistory" :key="customer._id" class="border-b">
-              <td class="px-4 py-2 border-2 border-black">{{ customer.id_blok.blokname }}</td>
-              <td class="px-4 py-2 border-2 border-black">{{ customer.id_rumah.no_rumah }}</td>
-              <div v-if="customer.verifikasi_data === true">
-                <td class="px-4 py-2">Terverifikasi</td>
-              </div>
-              <div v-else-if="customer.verifikasi_data === false">
-                <td class="px-4 py-2">Belum Terverifikasi</td>
-              </div>
-              <td class="px-4 py-2 border-2 border-black">{{ customer.kavling[0].no_kavling }}</td>
-              <td class="px-4 py-2 border-2 border-black">{{ customer.kavling[0].type }}</td>
-              <td class="px-4 py-2 border-2 border-black">{{ customer.kavling[0].luas_bangunan }}</td>
-              <td class="px-4 py-2 border-2 border-black">{{ customer.kavling[0].luas_tanah }}</td>
-              <td class="px-4 py-2 border-2 border-black">
-                <button @click="tanyaAdmin(customer)" class="px-4 py-2 bg-blue-500 text-white rounded-lg">
-                  Chat
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-    <div v-else>
-      <p class="text-end">Belum ada riwayat.</p>
     </div>
 
-    <div v-if="isModalVisible" class="fixed inset-0 flex items-center justify-center z-30 bg-black bg-opacity-50">
-      <div class="bg-white p-6 rounded-lg shadow-lg w-96">
-        <h2 class="text-lg font-semibold mb-4">
-          {{ isEdit ? 'Edit House' : 'Add New House' }}
-        </h2>
-        <form @submit.prevent="submitForm">
-          <div class="mb-4">
-            <label class="block text-sm font-medium mb-1">Blok</label>
-            <select v-model="form.id_blok" class="w-full p-2 border border-gray-300 rounded-lg">
-              <option v-for="blok in bloks" :key="blok._id" :value="blok._id">{{ blok.blokname }}</option>
-            </select>
+    <div v-if="validationForm" class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+      <div class="relative bg-white p-6 rounded-lg shadow-lg text-center">
+        <div>
+          <div class="absolute top-2 right-2">
+            <button @click="closed" class="text-gray-600 hover:text-black text-xl">✖</button>
           </div>
-          <div class="mb-4">
-            <label class="block text-sm font-medium mb-1">No Rumah</label>
-            <input v-model="form.no_rumah" type="text" class="w-full p-2 border border-gray-300 rounded-lg" />
+          <div>
+            <h1>Apakah Anda Yakin Ingin Membooking?</h1>
           </div>
-          <div class="mb-4">
-            <label class="block text-sm font-medium mb-1">Type Rumah</label>
-            <input v-model="form.type_rumah" type="text" class="w-full p-2 border border-gray-300 rounded-lg" />
+        </div>
+        <div class="flex justify-around mt-6">
+          <div>
+            <button @click="no" class="px-4 py-2 bg-green-500 text-white rounded-lg">
+              <h1>Cance</h1>
+            </button>
           </div>
-          <div class="mb-4">
-            <label class="block text-sm font-medium mb-1">Status Rumah</label>
-            <select v-model="form.status_rumah" class="w-full p-2 border border-gray-300 rounded-lg">
-              <option :value="true">Tersedia</option>
-              <option :value="false">Terjual</option>
-            </select>
+          <div>
+            <button @click="yes" class="px-4 py-2 bg-blue-500 text-white rounded-lg">
+              <h1>Yes</h1>
+            </button>
           </div>
-          <div class="flex justify-end space-x-4">
-            <button type="button" @click="closeModal"
-              class="px-4 py-2 bg-gray-500 text-white rounded-lg">Cancel</button>
-            <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg">{{ isEdit ? 'Update' : 'Create'
-              }}</button>
-          </div>
-        </form>
+        </div>
       </div>
     </div>
+
     <div v-if="isCustomerModalVisible"
       class="fixed inset-0 flex items-center justify-center z-30 bg-black bg-opacity-50">
       <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-3xl h-4/5 overflow-y-auto">
@@ -343,9 +256,8 @@
                 class="w-full p-2 border border-gray-300 rounded-lg" />
             </div>
           </div>
-          <h4 class="text-lg font-semibold mb-2">Pembayaran</h4>
-          <div>
-            <label class="block text-sm font-medium mb-1">Tipe Pembayaran</label>
+          <h4 class="text-lg mb-2 font-normal">Tipe Pembayaran</h4>
+          <div class="pt-2 pb-4">
             <select v-model="customerForm.type_pembayaran" required
               class="w-full p-2 border border-gray-300 rounded-lg">
               <option value="kpr">KPR</option>
@@ -355,20 +267,22 @@
           <div class="flex justify-end space-x-4">
             <button type="button" @click="closeCustomerModal"
               class="px-4 py-2 bg-gray-500 text-white rounded-lg">Cancel</button>
-            <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg">Submit & Lanjutkan</button>
+            <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg">Simpan</button>
           </div>
         </form>
       </div>
     </div>
 
-    <div class="w-full h-full bg-white border border-gray-300 rounded-lg shadow-lg overflow-auto">
-      <div ref="svgContainer" class="flex justify-center items-center">
+    <div class="w-full h-screen overflow-auto">
+      <div class="flex justify-center items-center -rotate-[30deg]">
+        <div ref="svgContainer">
+        </div>
       </div>
     </div>
 
     <div ref="indicator"></div>
     <div v-if="tooltipVisible" :style="tooltipStyle"
-      class="absolute bg-gray-800 text-white text-xs p-2 rounded-lg shadow-lg z-20">
+      class="absolute bg-gray-800 text-white text-sm p-2 rounded-lg shadow-lg z-20">
       {{ tooltipText }}
     </div>
   </div>
@@ -384,7 +298,6 @@ import custumerApi from '@/services/custumerApi';
 import Swal from 'sweetalert2';
 
 export default {
-
   data() {
     return {
       svgUrl: '/img/file_with_ids.svg',
@@ -396,6 +309,8 @@ export default {
       tooltipStyle: {},
       panZoomInstance: null,
       isCustomerModalVisible: false,
+      path_id: [],
+      path_rumah: [],
       form: {
         id_blok: '',
         id_rumah: '',
@@ -456,54 +371,50 @@ export default {
       userHistory: [],
       selectedCustomer: null,
       show: false,
+      showChoose: false,
+      validationForm: false
     };
   },
   mounted() {
     this.loadSvg();
     this.fetchBloks();
     this.fetchHouses();
-    this.getUserHistory()
   },
   methods: {
-    async tanyaAdmin(customer) {
-      this.selectedCustomer = customer;
-      const message = `Marketing : ${customer.id_user.username} - Blok : ${customer.id_blok.blokname} - 
-      No Rumah : ${customer.id_rumah.no_rumah} - Tipe : ${customer.id_rumah.type_rumah}`;
-      const encodedMessage = btoa(message); // Encode the message to Base64
-      await this.$router.push({ path: '/live-chat', query: { message: encodedMessage } });
+    closed() {
+      this.showChoose = false;
+      this.validationForm = false;
     },
-    closeTicketModal() {
-      this.isTicketModalVisible = false;
-      this.ticketContent = "";
+    forms() {
+      this.isCustomerModalVisible = true;
+      this.handleClick(this.path_id, this.path_rumah);
+      this.showChoose = false
     },
-    riwayat() {
-      if (this.show !== true) {
-        this.show = true
+    async yes() {
+      this.loadHouseData(this.path_id, this.path_rumah.id_blok);
+      console.log(this.path_rumah._id);
+      if (this.path_rumah.status_rumah === 'deterjual') {
+        try {
+          const response = await custumerApi.updateHouseStatus(this.path_rumah._id, 'terbooking');
+          console.log(response)
+          this.showSuccessAlert('Rumah berhasil dibooking');
+          this.customerForm.house_info.status_rumah = 'terbooking';
+          this.closeCustomerModal();
+          this.showChoose = false;
+          this.validationForm = false
+        } catch (error) {
+          this.showErrorAlert('Gagal membooking rumah');
+          console.error('Error booking house:', error);
+        }
       } else {
-        this.closeRiwayat()
+        this.showAlert('Rumah Sudah dibooking, mohon cari rumah yang lain.', 'info');
       }
     },
-    closeRiwayat() {
-      this.show = false
+    no() {
+      this.validationForm = false
     },
-    async getUserHistory() {
-      custumerApi.getUserHistory()
-        .then(res => {
-          this.userHistory = res.data.data
-        })
-        .catch(error => {
-          console.log(error)
-        })
-    },
-    async logout() {
-      try {
-        await this.$store.dispatch("logout");
-        this.$toast.success("Successfully logged out.", { position: "bottom-left", duration: 1000 });
-        await this.$router.push("/login");
-      } catch (e) {
-        console.log(e);
-        this.$toast.error("Couldn't log out.", { position: "bottom-left", duration: 1000 });
-      }
+    async bookHouse() {
+      this.validationForm = true
     },
     onFileChange(event, fieldName) {
       const file = event.target.files[0];
@@ -570,7 +481,24 @@ export default {
           });
 
           path.addEventListener('click', () => {
-            this.handleClick(id, house);
+            if (house && house.status_rumah === "deterjual") {
+              this.showChoose = true
+              this.path_id = id;
+              this.path_rumah = house;
+              console.log(this.path_id)
+            } else if (house && house.status_rumah === "terbooking") {
+              this.showChoose = true
+              this.path_id = id;
+              this.path_rumah = house;
+            } else if (house && house.status_rumah === "terjual") {
+              this.showAlert('Rumah Sudah Terjual', 'info');
+            } else if (house && house.status_rumah === "cash") {
+              this.showAlert('Rumah Sudah Terjual Cash', 'info');
+            } else if (house && house.status_rumah === "kpr") {
+              this.showAlert('Rumah Sudah Terjual Kpr', 'info');
+            }
+            //console.log(this.path_rumah)
+            // this.handleClick(id, house);
           });
         }
       });
@@ -625,7 +553,6 @@ export default {
     },
     handleClick(id, house) {
       this.selectedId = id;
-
       if (house && house.status_rumah === "deterjual") {
         this.customerForm.id_rumah = house._id;
         this.customerForm.id_blok = house.id_blok;
@@ -637,12 +564,14 @@ export default {
       } else if (house && house.status_rumah === "cash") {
         this.showAlert('Rumah Sudah Terjual Cash', 'info');
         this.closeModal();
-      } else if (house && house.status_rumah === "terbooking") {
-        this.showAlert('Rumah Sudah Terjual', 'info');
-        this.closeModal();
       } else if (house && house.status_rumah === "kpr") {
         this.showAlert('Rumah Dalam KPR', 'info');
         this.closeModal();
+      } else if (house && house.status_rumah === "terbooking") {
+        this.customerForm.id_rumah = house._id;
+        this.customerForm.id_blok = house.id_blok;
+        this.closeModal();
+        this.loadHouseData(id, house.id_blok);
       }
     },
     openModal() {
@@ -677,8 +606,8 @@ export default {
       blokApi.getById(id_blok)
         .then((response) => {
           this.customerForm.blokname = response.data.data.blokname;
-          this.isCustomerModalVisible = true;
-          this.isModalVisible = false;
+          //this.isCustomerModalVisible = true;
+          //this.isModalVisible = false;
         })
         .catch((error) => {
           console.error("Error fetching blok data:", error);
@@ -712,10 +641,6 @@ export default {
 
         for (let fileKey in this.customerForm.customerFile) {
           formData.append(fileKey, this.customerForm.customerFile[fileKey]);
-          // if (this.customerForm.customerFile[fileKey]) {
-          // } else {
-          //   throw new Error(`File ${fileKey} wajib diupload.`);
-          // }
         }
 
         await custumerApi.create(formData, {
@@ -724,11 +649,9 @@ export default {
           }
         });
         this.showSuccessAlert('Form berhasil dikirim!');
-        // this.$toast.success("Form berhasil dikirim!");
         this.closeCustomerModal();
       } catch (error) {
         this.showErrorAlert('Form gagal dikirim!');
-        // this.$toast.error(error.message || "Terjadi kesalahan saat mengirim form.");
         console.error(error);
       }
     }
@@ -776,6 +699,8 @@ export default {
           jenis_usaha: ''
         }
       };
+      this.path_id = null;
+      this.path_rumah = null;
     },
     fetchBloks() {
       blokApi.getAll()
@@ -808,15 +733,21 @@ export default {
     },
     initializePanZoom() {
       const svgElement = this.$refs.svgContainer.querySelector('svg');
+
+      svgElement.setAttribute('width', '1200px');  // Atur lebar sesuai kebutuhan
+      svgElement.setAttribute('height', '1200px'); // Atur tinggi sesuai kebutuhan
+
       if (svgElement) {
         this.panZoomInstance = svgPanZoom(svgElement, {
           zoomEnabled: true,
-          controlIconsEnabled: true,
+          // controlIconsEnabled: true,
           fit: true,
           center: true,
           minZoom: 0.5,
           maxZoom: 10,
         });
+
+        this.panZoomInstance.zoom(0.8);
       }
     },
   },

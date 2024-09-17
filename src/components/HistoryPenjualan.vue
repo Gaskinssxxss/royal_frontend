@@ -312,7 +312,7 @@ export default {
         },
 
         getImageUrl(filePath) {
-            return `http://192.168.1.4:3000/${filePath}`;
+            return `http://192.168.1.10:3000/${filePath}`;
         },
 
         async fetchBlocksAndHouses() {

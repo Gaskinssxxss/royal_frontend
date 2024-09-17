@@ -1,4 +1,10 @@
 <template>
+    <div>
+        <h1>test</h1>
+    </div>
+</template>
+
+<!-- <template>
     <div class="p-4">
         <div v-if="keuanganList.length > 0">
             <table class="min-w-full border-collapse border-2 border-black text-center mb-6 text-base">
@@ -20,12 +26,11 @@
                         <td class="border-2 border-black px-4 py-2">{{ keuangan.nomor_pembayaran }}</td>
                         <td class="border-2 border-black px-4 py-2">{{ keuangan.id_customer.data_pribadi[0].namaLengkap
                             }}</td>
-                        <td class="border-2 border-black px-4 py-2">{{ formatRupiah(keuangan.harga_rumah[0].harga) }}
-                        </td>
-                        <td class="border-2 border-black px-4 py-2">{{ formatRupiah(keuangan.harga_rumah[0].dp) }}</td>
-                        <td class="border-2 border-black px-4 py-2">{{ keuangan.harga_rumah[0].bunga }}%</td>
                         <td class="border-2 border-black px-4 py-2">{{
-                            calculateJangkaWaktu(keuangan.harga_rumah[0].jangka_waktu) }} bulan</td>
+                            formatRupiah(keuangan.perhitungan_harga_rumah[0].harga_rumah) }}
+                        </td>
+                        <td class="border-2 border-black px-4 py-2">{{ formatRupiah(keuangan.harga_rumah[0]) }}</td>
+                        <td class="border-2 border-black px-4 py-2">{{ keuangan.harga_rumah[0] }}%</td>
                         <td class="border-2 border-black px-4 py-2">{{
                             formatRupiah(calculatePembayaranBulanan(keuangan)) }}</td>
                         <td class="border-2 border-black px-4 py-2">
@@ -142,18 +147,16 @@ export default {
                 confirmButtonText: 'Ok!',
             });
         },
-        // Mendapatkan data keuangan dari API
         getKeuanganData() {
             keuanganApi.getAll()
                 .then((res) => {
                     this.keuanganList = res.data.data;
+                    console.log(this.keuanganList)
                 })
                 .catch((error) => {
                     console.error("Error saat mengambil data keuangan:", error);
                 });
         },
-
-        // Format angka ke Rupiah
         formatRupiah(angka) {
             return new Intl.NumberFormat("id-ID", {
                 style: "currency",
@@ -161,22 +164,16 @@ export default {
                 minimumFractionDigits: 0,
             }).format(angka);
         },
-
-        // Format tanggal ke format yang lebih mudah dibaca
         formatDate(date) {
             const options = { year: 'numeric', month: 'long', day: 'numeric' };
             return new Date(date).toLocaleDateString('id-ID', options);
         },
-
-        // Kalkulasi jangka waktu dalam bulan
         calculateJangkaWaktu(jangkaWaktu) {
             const currentDate = new Date();
             const endDate = new Date(jangkaWaktu);
             const months = (endDate.getFullYear() - currentDate.getFullYear()) * 12 + endDate.getMonth() - currentDate.getMonth();
             return months > 0 ? months : 0;
         },
-
-        // Kalkulasi pembayaran bulanan
         calculatePembayaranBulanan(keuangan) {
             const { harga, dp, bunga } = keuangan.harga_rumah[0];
             const totalPinjaman = harga - dp;
@@ -186,28 +183,20 @@ export default {
             const pembayaranBulanan = (totalPinjaman * bungaPerBulan) / (1 - Math.pow(1 + bungaPerBulan, -months));
             return pembayaranBulanan > 0 ? pembayaranBulanan : 0;
         },
-
-        // Kalkulasi total tagihan yang sudah dibayar (saldo kredit)
         calculateTotalTagihan(keuangan) {
             const saldoKredit = keuangan.kredit.reduce((acc, kredit) => acc + kredit.saldo, 0);
             return saldoKredit;
         },
-
-        // Kalkulasi total pembayaran yang harus dilakukan
         calculateTotalPembayaran(keuangan) {
             const { harga, dp } = keuangan.harga_rumah[0];
             return harga - dp;
         },
-
-        // Kalkulasi progress pembayaran
         calculateProgress(keuangan) {
             const totalPembayaran = this.calculateTotalPembayaran(keuangan);
             const totalTagihan = this.calculateTotalTagihan(keuangan);
             if (totalPembayaran === 0) return 0;
             return Math.min((totalTagihan / totalPembayaran) * 100, 100).toFixed(2);
         },
-
-        // Buka modal dan set data history kredit yang akan ditampilkan
         openModal(kreditList, customerId, keuangan, nomor_pembayaran) {
             this.selectedKredit = kreditList;
             this.selectedCustomerId = customerId;
@@ -215,8 +204,6 @@ export default {
             this.pembayaranBulananStatis = this.calculatePembayaranBulanan(keuangan);
             this.showModal = true;
         },
-
-        // Tutup modal
         closeModal() {
             this.showModal = false;
             this.selectedKredit = [];
@@ -226,8 +213,6 @@ export default {
                 saldo: 0
             };
         },
-
-        // Tambahkan pembayaran kredit baru
         addKreditPembayaran() {
             if (!this.newKredit.tanggal) {
                 this.showAlert('Masukkan tanggal yang valid.');
@@ -236,7 +221,7 @@ export default {
 
             const newPayment = {
                 tanggal: this.newKredit.tanggal,
-                saldo: this.pembayaranBulananStatis // Menggunakan saldo dari pembayaran bulanan
+                saldo: this.pembayaranBulananStatis
             };
 
             keuanganApi.update(this.selectedCustomerId, {
@@ -244,8 +229,8 @@ export default {
             })
                 .then(() => {
                     this.showSuccessAlert('Pembayaran kredit berhasil ditambahkan.');
-                    this.getKeuanganData(); // Refresh data
-                    this.closeModal(); // Tutup modal setelah penambahan
+                    this.getKeuanganData();
+                    this.closeModal();
                 })
                 .catch(error => {
                     console.error('Error saat menambahkan pembayaran kredit:', error);
@@ -254,8 +239,4 @@ export default {
         }
     },
 };
-</script>
-
-<style scoped>
-/* Optional styling for progress bar and modal */
-</style>
+</script> -->

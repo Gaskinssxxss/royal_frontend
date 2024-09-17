@@ -19,4 +19,7 @@ export default {
   delete(id) {
     return Api.delete(`/keuangan/${id}`);
   },
+  getKeuanganCustomerStatusDp() {
+    return Api.get("/keuangan/status-dp");
+  },
 };

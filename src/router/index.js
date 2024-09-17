@@ -1,47 +1,38 @@
+/* eslint-disable */
+
 import { createRouter, createWebHistory } from "vue-router";
-import HomeView from "@/views/HouseMap.vue";
 import adminDashboard from "@/views/adminDashboard.vue";
 import LoginView from "@/views/LoginView.vue";
 import RegisterView from "@/views/RegisterView.vue";
 import UnauthorizedView from "@/views/UnauthorizedView.vue";
 import store from "@/services/store";
 import LiveChat from "@/views/LiveChat.vue";
-import keuanganPage from "@/components/keuanganPage.vue";
-import progresBar from "@/components/progresBar.vue";
 import KeunganDashboard from "@/views/KeunganDashboard.vue";
+import marketingDashboard from "@/views/marketingDashboard.vue";
+
 const routes = [
   {
     path: "/",
     redirect: { name: "Login" },
   },
   {
-    path: "/keuangan",
-    name: "Keuangan",
-    component: keuanganPage,
+    path: "/marketing",
+    name: "marketingDashboard",
+    component: marketingDashboard,
     meta: {
-      title: "Keuangan",
+      title: "Marketing Dashboard",
       authRequired: true,
       role: "marketing",
     },
   },
   {
-    path: "/keuanganDashboard",
+    path: "/keuangan",
     name: "KeuanganDashboard",
     component: KeunganDashboard,
     meta: {
-      title: "Keuangan",
+      title: "Keuangan Dashboard",
       authRequired: true,
       role: "keuangan",
-    },
-  },
-  {
-    path: "/progres",
-    name: "Progres",
-    component: progresBar,
-    meta: {
-      title: "Progres",
-      authRequired: true,
-      role: "marketing",
     },
   },
   {
@@ -50,16 +41,6 @@ const routes = [
     component: LiveChat,
     meta: {
       title: "Live Chat",
-      authRequired: true,
-      role: "marketing",
-    },
-  },
-  {
-    path: "/Marketing",
-    name: "Marketing",
-    component: HomeView,
-    meta: {
-      title: "Marketing",
       authRequired: true,
       role: "marketing",
     },
@@ -132,7 +113,6 @@ router.beforeEach(async (to, from, next) => {
     to.meta.role &&
     to.meta.role !== userRole
   ) {
-    next({ name: "Unauthorized" });
   } else {
     next();
   }

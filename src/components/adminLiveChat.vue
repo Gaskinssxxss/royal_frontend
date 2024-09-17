@@ -67,7 +67,7 @@ export default {
         }
     },
     mounted() {
-        this.socket = io('http://192.168.1.4:3000/');
+        this.socket = io('http://192.168.1.10:3000/');
         const savedChats = JSON.parse(localStorage.getItem('activeChats')) || {};
         api.get('chats/active')
             .then(res => res.data)

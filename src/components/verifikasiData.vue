@@ -42,10 +42,10 @@
                             <td class="border-2 border-black px-2 py-2">{{ custom.id_blok.blokname }}</td>
                             <td class="border-2 border-black px-2 py-2">{{ custom.id_rumah.no_rumah }}</td>
                             <td class="border-2 border-black px-2 py-2">{{ custom.id_rumah.type_rumah }}</td>
-                            <div v-if="custom.verifikasi_data === true" class="border-2 border-t-black">
+                            <div v-if="custom.verifikasi_data === true">
                                 <td class="px-2 pt-4 text-marydeep">Terverifikasi</td>
                             </div>
-                            <div v-if="custom.verifikasi_data === false" class="border-2 border-t-black">
+                            <div v-if="custom.verifikasi_data === false">
                                 <td class="px-2 pt-4 text-che">Belum diverifikasi</td>
                             </div>
                             <td class="border-2 border-black pl-2 pt-3 pb-2">
@@ -457,7 +457,7 @@ export default {
             }
         },
         getFullImgPath(img) {
-            return `http://192.168.1.4:3000/${img}`;
+            return `http://192.168.1.10:3000/${img}`;
         },
         openLightbox(image) {
             this.lightboxImages = [image];

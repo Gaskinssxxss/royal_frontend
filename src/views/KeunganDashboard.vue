@@ -27,6 +27,18 @@
                         <h1 class="pl-2 uppercase">Dashboard</h1>
                     </button>
                 </div>
+                <div @click="blok" :class="{ 'bg-red-500': isClick.hs }"
+                    class="hover:bg-gray-200 hover:border hover:border-gray-200">
+                    <button>
+                        <h1 class="pl-2 uppercase">Blok Plan</h1>
+                    </button>
+                </div>
+                <div @click="dataCustomer" :class="{ 'bg-red-500': isClick.dc }"
+                    class="hover:bg-gray-200 hover:border hover:border-gray-200">
+                    <button>
+                        <h1 class="pl-2 uppercase">Data Customer</h1>
+                    </button>
+                </div>
                 <div @click="keuanganPage" :class="{ 'bg-red-500': isClick.kp }"
                     class="hover:bg-gray-200 hover:border hover:border-gray-200">
                     <button>
@@ -57,6 +69,12 @@
                     <div v-if="ds">
                         <dashboardSpez />
                     </div>
+                    <div v-if="dc">
+                        <dataCustomerFinance />
+                    </div>
+                    <div v-if="hs">
+                        <HouseMapAdmin />
+                    </div>
                     <div v-if="hsp">
                         <HistoryPenjualan />
                     </div>
@@ -66,7 +84,6 @@
                     <div v-if="pg">
                         <progresBar />
                     </div>
-
                 </div>
             </div>
         </div>
@@ -79,12 +96,17 @@ import HistoryPenjualan from '@/components/HistoryPenjualan.vue';
 import progresBar from '@/components/progresBar.vue';
 import custumerApi from '@/services/custumerApi';
 import keuanganPage from '@/components/keuanganPage.vue';
+import dataCustomerFinance from '@/components/dataCustomerFinance.vue';
+import HouseMapAdmin from './HouseMapAdmin.vue';
+
 export default {
     components: {
         dashboardSpez,
         HistoryPenjualan,
         keuanganPage,
-        progresBar
+        progresBar,
+        dataCustomerFinance,
+        HouseMapAdmin
     },
     data() {
         return {
@@ -94,14 +116,20 @@ export default {
                 historypenjualan: false,
                 kp: false,
                 pg: false,
+                iv: false,
+                dc: false,
+                hs: false
             },
+            hs: false,
+            dc: false,
             ds: true,
             hsp: false,
             kp: false,
             pg: false,
             historypenjualan: false,
             nilai: 0,
-            adminlive: false
+            adminlive: false,
+            iv: false
         }
     },
     computed: {
@@ -113,6 +141,21 @@ export default {
         this.getUnverifiedCustomers()
     },
     methods: {
+        blok() {
+            this.resets()
+            this.hs = true;
+            this.isClick.hs = true
+        },
+        Invocive() {
+            this.resets();
+            this.isClick.iv = true;
+            this.iv = true;
+        },
+        dataCustomer() {
+            this.resets()
+            this.dc = true;
+            this.isClick.dc = true
+        },
         keuanganPage() {
             this.resets()
             this.kp = true;
@@ -179,10 +222,14 @@ export default {
             this.ed = false;
             this.de = false;
             this.dt = false;
+            this.dc = false;
+            this.hs = false;
+            this.isClick.dc = false
             this.adminlive = false;
             this.lsaccount = false;
             this.createaccount = false;
             this.isClick.dashboard = false;
+            this.isClick.hs = false;
             this.isClick.verifikasi = false;
             this.isClick.edit = false;
             this.isClick.deleted = false;
@@ -204,6 +251,8 @@ export default {
             this.isClick.kp = false;
             this.isClick.pg = false
             this.pg = false;
+            this.isClick.iv = false;
+            this.iv = false;
         },
         deleted() {
             this.resets();

@@ -7,6 +7,7 @@
     </div>
 
     <div v-if="user" class="p-2 ml-2">
+        <Notification ref="notification" />
         <div class="h-screen w-screen flex justify-start font-anton uppercase text-xl">
             <div class="border-2 border-black space-y-4">
                 <div class="flex space-x-24 pb-4 p-2 hover:bg-gray-200 hover:border hover:border-gray-200">
@@ -33,17 +34,18 @@
                         <h1 class="pl-2 uppercase">Live Chat</h1>
                     </button>
                 </div>
+                <div @click="blok" :class="{ 'bg-red-500': isClick.hs }"
+                    class="hover:bg-gray-200 hover:border hover:border-gray-200">
+                    <button>
+                        <h1 class="pl-2 uppercase">Blok Plan</h1>
+                    </button>
+                </div>
                 <div @click="verifikasi" :class="{ 'bg-red-500': isClick.verifikasi }"
-                    class="hover:bg-gray-200 hover:border hover:border-gray-200 flex space-x-2">
+                    class="hover:bg-gray-200 hover:border hover:border-gray-200">
                     <div>
                         <button>
                             <h1 class="pl-2 uppercase">Verifikasi Data</h1>
                         </button>
-                    </div>
-                    <div class="bg-che text-gray-200 border-2 border-black rounded-full text-base -mt-1">
-                        <h1 class="px-3 pt-0.5">
-                            {{ nilai }}
-                        </h1>
                     </div>
                 </div>
                 <div @click="checklist" :class="{ 'bg-red-500': isClick.terverifikasi }"
@@ -106,6 +108,9 @@
                     <div v-if="ds">
                         <dashboardSpez />
                     </div>
+                    <div v-if="hs">
+                        <HouseMap />
+                    </div>
                     <div v-if="vd">
                         <verifikasiData />
                     </div>
@@ -155,10 +160,11 @@ import accountList from '@/components/accountList.vue';
 import CreateAccount from '@/components/CreateAccount.vue';
 import EditAccount from '@/components/EditAccount.vue';
 import DeleteAccount from '@/components/deleteAccount.vue';
-import custumerApi from '@/services/custumerApi';
 import ticketList from '@/components/ticketList.vue';
 import HistoryPenjualan from '@/components/HistoryPenjualan.vue';
 import adminLiveChat from '@/components/adminLiveChat.vue';
+import Notification from '@/components/NotificationModal.vue';
+import HouseMap from './HouseMapAdmin.vue';
 
 export default {
     components: {
@@ -173,7 +179,9 @@ export default {
         DeleteAccount,
         ticketList,
         HistoryPenjualan,
-        adminLiveChat
+        adminLiveChat,
+        Notification,
+        HouseMap
     },
     data() {
         return {
@@ -190,8 +198,10 @@ export default {
                 LogOut: false,
                 tiketlist: false,
                 historypenjualan: false,
-                live: false
+                live: false,
+                hs: false
             },
+            hs: false,
             ds: true,
             vd: false,
             ed: false,
@@ -203,7 +213,6 @@ export default {
             deleteakun: false,
             tiketlist: false,
             historypenjualan: false,
-            nilai: 0,
             adminlive: false
         }
     },
@@ -212,10 +221,15 @@ export default {
             return this.$store.state.user;
         },
     },
-    mounted() {
-        this.getUnverifiedCustomers()
-    },
     methods: {
+        blok() {
+            this.resets()
+            this.hs = true;
+            this.isClick.hs = true
+        },
+        showNotification(message) {
+            this.$refs.notification.notify(message);
+        },
         live() {
             this.resets()
             this.adminlive = true;
@@ -231,19 +245,6 @@ export default {
             this.resets();
             this.isClick.tiketlist = true
             this.tiketlist = true;
-        },
-        getUnverifiedCustomers() {
-            custumerApi.getUnverifiedCustomers()
-                .then(res => {
-                    if (res.data.data.length !== 0) {
-                        this.nilai = res.data.data.length;
-                    } else {
-                        this.nilai = 0
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                });
         },
         async logout() {
             try {
@@ -277,6 +278,7 @@ export default {
             this.isClick.listaccount = true;
         },
         resets() {
+            this.hs = false
             this.vd = false;
             this.ds = false;
             this.ed = false;
@@ -285,6 +287,7 @@ export default {
             this.adminlive = false;
             this.lsaccount = false;
             this.createaccount = false;
+            this.isClick.hs = false;
             this.isClick.dashboard = false;
             this.isClick.verifikasi = false;
             this.isClick.edit = false;

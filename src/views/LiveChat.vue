@@ -96,7 +96,7 @@ export default {
             this.initializeChat();
         },
         initializeChat() {
-            this.socket = io('http://192.168.1.4:3000/', { transports: ['websocket'] });
+            this.socket = io('http://192.168.1.10:3000/', { transports: ['websocket'] });
 
             this.socket.emit('join', { visitorID: this.visitorID });
 
