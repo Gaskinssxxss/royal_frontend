@@ -17,44 +17,43 @@
             </div>
         </div>
         <div>
-            <div class="text-lg">
+            <div class="text-sm">
                 <table v-if="customer.length > 0" class="min-w-full border-collapse border-2 border-black text-center">
                     <thead>
-                        <tr>
-                            <th class="border-2 border-black px-2 py-2 font-normal">Marketer</th>
-                            <th class="border-2 border-black px-2 py-2 font-normal">Nama Lengkap</th>
-                            <th class="border-2 border-black px-2 py-2 font-normal">Nomor Hp</th>
-                            <th class="border-2 border-black px-2 py-2 font-normal">Email</th>
-                            <th class="border-2 border-black px-2 py-2 font-normal">Nama Blok</th>
-                            <th class="border-2 border-black px-2 py-2 font-normal">Nomor Rumah</th>
-                            <th class="border-2 border-black px-2 py-2 font-normal">Tipe Rumah</th>
-                            <th class="border-2 border-black px-2 py-2 font-normal">Status rumah</th>
-                            <th class="border-2 border-black px-2 py-2 font-normal">Status</th>
-                            <th class="border-2 border-black px-2 py-2 font-normal">Aksi</th>
+                        <tr class="text-base">
+                            <th class="px-2 py-2 border border-black font-normal text-lg">Id</th>
+                            <th class="border-2 border-black px-1 py-2 font-normal">Marketer</th>
+                            <th class="border-2 border-black px-1 py-2 font-normal">Nama Lengkap</th>
+                            <th class="border-2 border-black px-1 py-2 font-normal">Nomor Hp</th>
+                            <th class="border-2 border-black px-1 py-2 font-normal">Type Pembayaran</th>
+                            <th class="border-2 border-black px-1 py-2 font-normal">Status Berkas</th>
+                            <th class="border-2 border-black px-1 py-2 font-normal">Aksi</th>
                         </tr>
                     </thead>
                     <tbody v-for="custom in customer" :key="custom._id">
                         <tr>
-                            <td class="border-2 border-black px-2 py-2">{{ custom.id_user.username }}</td>
-                            <td class="border-2 border-black px-2 py-2">{{ custom.data_pribadi[0].namaLengkap }}</td>
-                            <td class="border-2 border-black px-2 py-2">{{ custom.data_pribadi[0].no_kontak }}</td>
-                            <td class="border-2 border-black px-2 py-2">{{ custom.data_pribadi[0].email }}</td>
-                            <td class="border-2 border-black px-2 py-2">{{ custom.id_blok.blokname }}</td>
-                            <td class="border-2 border-black px-2 py-2">{{ custom.id_rumah.no_rumah }}</td>
-                            <td class="border-2 border-black px-2 py-2">{{ custom.id_rumah.type_rumah }}</td>
-                            <td class="border-2 border-black px-2 py-2">{{ custom.id_rumah.status_rumah }}</td>
-                            <div v-if="custom.verifikasi_data === true">
-                                <td class="px-2 pt-5 text-marydeep">Terverifikasi</td>
-                            </div>
-                            <div v-if="custom.verifikasi_data === false">
-                                <td class="px-2 pt-5">Belum Terverifikasi</td>
+                            <td class="px-1 py-2 border border-black text-sm text-start pl-4">
+                                ADR - 0{{ custom.kavling[0].type.replace('Type ', '') }} -
+                                {{ custom.id_blok.blokname }} - 0{{ custom.id_rumah.no_rumah }}
+                            </td>
+                            <td class="border-2 border-black px-1 py-2">{{ custom.id_user.username }}</td>
+                            <td class="border-2 border-black px-1 py-2">{{ custom.data_pribadi[0].namaLengkap }}</td>
+                            <td class="border-2 border-black px-1 py-2">{{ custom.data_pribadi[0].no_kontak }}</td>
+                            <td class="border-2 border-black px-1 py-2">{{ custom.type_pembayaran }}</td>
+                            <div class="border-t border-black">
+                                <div v-if="custom.verifikasi_data === true">
+                                    <td class="px-2 pt-5 text-marydeep">Terverifikasi</td>
+                                </div>
+                                <div v-if="custom.verifikasi_data === false">
+                                    <td class="px-2 pt-5 text-che">Belum Terverifikasi</td>
+                                </div>
                             </div>
                             <td class="border-2 border-black pl-2 pt-3 pb-2">
-                                <div @click="openModal(custom._id, 1)">
+                                <div @click="openModal(custom._id, 1, custom)">
                                     <button class="bg-black text-black rounded">
                                         <h1
                                             class="bg-gray-200 border-2 rounded px-4 py-2 border-black uppercase transition-transform duration-300 ease-linear transform -translate-x-1 -translate-y-1 hover:-translate-x-2 hover:-translate-y-2">
-                                            Data Lengkap
+                                            Data
                                         </h1>
                                     </button>
                                 </div>
@@ -338,6 +337,7 @@
 import custumerApi from '@/services/custumerApi';
 import VueEasyLightbox from 'vue-easy-lightbox';
 import Swal from 'sweetalert2';
+import ApiNotification from "../services/Notifitcation"
 export default {
     components: {
         VueEasyLightbox
@@ -404,6 +404,7 @@ export default {
             showData: false,
             selectedId: '',
             modalPage: 1,
+            selectedRumah: null,
             lightboxVisible: false,
             lightboxImages: [],
             shows: false
@@ -413,6 +414,19 @@ export default {
         this.getUnverifiedCustomers();
     },
     methods: {
+        async PostNotification(message) {
+            try {
+                const data = {
+                    content: message,
+                    user: this.$store.state.user._id,
+                    role_receivers: ["direktur"]
+                };
+                const result = await ApiNotification.create(data);
+                console.log(result)
+            } catch (error) {
+                console.log(error)
+            }
+        },
         showAlert(message, type = 'info') {
             Swal.fire({
                 title: 'Information',
@@ -437,7 +451,8 @@ export default {
                 confirmButtonText: 'Ok!',
             });
         },
-        openModal(id, page) {
+        openModal(id, page, rumah) {
+            this.selectedRumah = rumah;
             this.selectedId = id;
             this.modalPage = page;
             this.showData = true;
@@ -470,6 +485,7 @@ export default {
                 });
         },
         async deterjual(houseId) {
+            this.PostNotification(`Rumah ${this.selectedRumah.id_blok.blokname} ${this.selectedRumah.id_rumah.no_rumah} Batal Terjual`)
             custumerApi.deupdateHouseStatus(houseId)
                 .then(() => {
                     this.closeModal();
@@ -484,6 +500,7 @@ export default {
         },
         terjual(houseId, kondisi) {
             custumerApi.updateHouseStatus(houseId, kondisi)
+            this.PostNotification(`Rumah ${this.selectedRumah.id_blok.blokname} ${this.selectedRumah.id_rumah.no_rumah} Terjual`)
                 .then(() => {
                     if (kondisi === "terbooking") {
                         this.showSuccessAlert('Status rumah berhasil diperbarui menjadi terbooking');
@@ -509,11 +526,13 @@ export default {
                 this.getUnverifiedCustomers();
                 return;
             }
+
             if (this.selectedBlokname.length > 0) {
                 custumerApi.searchCustomerByBlokname(this.selectedBlokname)
                     .then(res => {
                         if (res.data.data.length > 0) {
                             this.customer = res.data.data;
+                            console.log(this.customer)
                         } else {
                             this.showAlert(`Tidak ada customer di blok ${this.selectedBlokname}`);
                         }

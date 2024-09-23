@@ -1,24 +1,36 @@
 <template>
     <div class="relative w-full h-screen p-4 bg-gray-100">
         <div v-if="customers.length > 0">
-            <table class="min-w-full border-collapse border-2 border-black text-center text-lg">
+            <table class="min-w-full border-collapse border-2 border-black text-center text-sm">
                 <thead>
-                    <tr>
-                        <th class="border-2 border-black px-2 py-2 font-normal">Nama Lengkap</th>
-                        <th class="border-2 border-black px-2 py-2 font-normal">Blok Rumah</th>
-                        <th class="border-2 border-black px-2 py-2 font-normal">No Rumah</th>
-                        <th class="border-2 border-black px-2 py-2 font-normal">No Kontak</th>
-                        <th class="border-2 border-black px-2 py-2 font-normal">Tipe Pembayaran</th>
+                    <tr class="text-base">
+                        <th class="border-2 border-black px-2 py-2 font-normal">id</th>
+                        <th class="border-2 border-black px-2 py-2 font-normal">Marketer</th>
+                        <th class="border-2 border-black px-2 py-2 font-normal">Nama Lengkap Customer</th>
+                        <th class="border-2 border-black px-2 py-2 font-normal">Nomor Hp Customer</th>
+                        <th class="border-2 border-black px-1 py-2 font-normal">Type Pembayaran</th>
+                        <th class="border-2 border-black px-1 py-2 font-normal">Status Berkas</th>
                         <th class="border-2 border-black px-2 py-2 font-normal">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-for="customer in customers" :key="customer._id">
+                        <td class="px-1 py-2 border border-black text-sm text-start pl-4">
+                            ADR - 0{{ customer.kavling[0].type.replace('Type ', '') }} -
+                            {{ customer.id_blok.blokname }} - 0{{ customer.id_rumah.no_rumah }}
+                        </td>
+                        <td class="border-2 border-black px-2 py-2">{{ customer.id_user.username }}</td>
                         <td class="border-2 border-black px-2 py-2">{{ customer.data_pribadi[0].namaLengkap }}</td>
-                        <td class="border-2 border-black px-2 py-2">{{ customer.id_blok.blokname }}</td>
-                        <td class="border-2 border-black px-2 py-2">{{ customer.id_rumah.no_rumah }}</td>
                         <td class="border-2 border-black px-2 py-2">{{ customer.data_pribadi[0].no_kontak }}</td>
-                        <td class="border-2 border-black px-2 py-2">{{ customer.type_pembayaran }}</td>
+                        <td class="border-2 border-black px-1 py-2">{{ customer.type_pembayaran }}</td>
+                        <div class="border-t border-black">
+                            <div v-if="customer.verifikasi_data === true">
+                                <td class="px-2 pt-5 text-marydeep">Terverifikasi</td>
+                            </div>
+                            <div v-if="customer.verifikasi_data === false">
+                                <td class="px-2 pt-5 text-che">Belum Terverifikasi</td>
+                            </div>
+                        </div>
                         <td class="border-2 border-black px-2 py-2">
                             <button @click="openEditCustomerModal(customer)"
                                 class="bg-blue-500 text-white px-4 py-2 rounded-lg">
@@ -29,12 +41,9 @@
                 </tbody>
             </table>
         </div>
-
-
         <div v-else>
             <p class="text-center">No customers found.</p>
         </div>
-
         <div v-if="isCustomerModalVisible"
             class="fixed inset-0 flex items-center justify-center z-30 bg-black bg-opacity-50">
             <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-3xl h-4/5 overflow-y-auto">
@@ -310,11 +319,9 @@ export default {
                 console.error(`No files selected for field: ${field}`);
             }
         },
-
         getImageUrl(filePath) {
             return `http://192.168.1.10:3000/${filePath}`;
         },
-
         async fetchBlocksAndHouses() {
             try {
                 const response = await houseApi.getBlokandHouse();
@@ -324,14 +331,11 @@ export default {
                 console.error("Error fetching blok and house data:", error);
             }
         },
-
-
         filterHousesByBlock() {
             this.filteredHouses = this.houses.filter(
                 (house) => house.id_blok._id === this.customerForm.id_blok
             );
         },
-
         async fetchCustomers() {
             try {
                 const response = await CustomerService.getVerifiedCustomers();
@@ -340,7 +344,6 @@ export default {
                 console.error("Error fetching customers:", error);
             }
         },
-
         openEditCustomerModal(customer) {
             this.customerForm.id_blok = customer.id_blok._id;
             this.customerForm.id_rumah = customer.id_rumah._id;
@@ -396,7 +399,6 @@ export default {
             this.filterHousesByBlock();
             this.isCustomerModalVisible = true;
         },
-
         async submitCustomerForm() {
             try {
                 const formData = new FormData();
@@ -415,7 +417,6 @@ export default {
                 console.error("Error updating customer data:", error);
             }
         },
-
         closeCustomerModal() {
             this.isCustomerModalVisible = false;
         },

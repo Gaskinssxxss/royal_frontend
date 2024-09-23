@@ -1,5 +1,34 @@
 <template>
   <div>
+    <div class="text-2xl absolute right-6 top-4">
+      <div class="text-base tracking-wider space-y-2">
+        <div class="flex space-x-2">
+          <div class="bg-green-500 w-5 h-5 pt-3 border border-black">
+          </div>
+          <h1>Available</h1>
+        </div>
+        <div class="flex space-x-2">
+          <div class="bg-che w-5 h-5 pt-3 border border-black">
+          </div>
+          <h1>Terjual Cash</h1>
+        </div>
+        <div class="flex space-x-2">
+          <div class="bg-iceBlue w-5 h-5 pt-3 border border-black">
+          </div>
+          <h1>Terjual Kpr</h1>
+        </div>
+        <div class="flex space-x-2">
+          <div class="bg-gray-700 w-5 h-5 pt-3 border border-black">
+          </div>
+          <h1>Terbookin</h1>
+        </div>
+        <div class="flex space-x-2">
+          <div class="bg-gray-300 w-5 h-5 pt-3 border border-black">
+          </div>
+          <h1>Terbookin Sementara</h1>
+        </div>
+      </div>
+    </div>
     <div v-if="showChoose" class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
       <div class="relative bg-white p-6 rounded-lg shadow-lg text-center">
         <div class="absolute top-2 right-2">
@@ -281,12 +310,11 @@
     </div>
 
     <div ref="indicator"></div>
-    <div v-if="tooltipVisible" :style="tooltipStyle"
-      class="absolute bg-gray-800 text-white text-sm p-2 rounded-lg shadow-lg z-20">
-      {{ tooltipText }}
+
+    <div v-if="tooltipVisible" :style="tooltipStyle" class="absolute text-white text-sm p-2 rounded-lg z-20">
+      <div v-html="tooltipText"></div>
     </div>
   </div>
-
 </template>
 
 
@@ -296,8 +324,13 @@ import houseApi from '@/services/houseApi';
 import blokApi from '@/services/blokApi';
 import custumerApi from '@/services/custumerApi';
 import Swal from 'sweetalert2';
-
+import ApiNotification from "../services/Notifitcation"
 export default {
+  computed: {
+    user() {
+      return this.$store.state.user;
+    }
+  },
   data() {
     return {
       svgUrl: '/img/file_with_ids.svg',
@@ -372,15 +405,30 @@ export default {
       selectedCustomer: null,
       show: false,
       showChoose: false,
-      validationForm: false
+      validationForm: false,
+      HouseandUser: []
     };
   },
   mounted() {
     this.loadSvg();
     this.fetchBloks();
     this.fetchHouses();
+    this.fetchCustomers();
   },
   methods: {
+    async PostNotification(message) {
+      try {
+        const data = {
+          content: message,
+          user: this.$store.state.user._id,
+          role_receivers: ["admin"]
+        };
+        const result = await ApiNotification.create(data);
+        console.log(result)
+      } catch (error) {
+        console.log(error)
+      }
+    },
     closed() {
       this.showChoose = false;
       this.validationForm = false;
@@ -393,9 +441,31 @@ export default {
     async yes() {
       this.loadHouseData(this.path_id, this.path_rumah.id_blok);
       console.log(this.path_rumah._id);
-      if (this.path_rumah.status_rumah === 'deterjual') {
+      if (this.path_rumah.status_rumah === 'deterjual' || this.path_rumah.status_rumah === 'terbooking_sementara') {
+        try {
+          const response = await custumerApi.updateHouseStatus(this.path_rumah._id, 'terbooking_sementara');
+          this.PostNotification('Ada Rumah Yang Terbooking Sementara')
+          console.log(response)
+          this.showSuccessAlert('Rumah berhasil dibooking sementara');
+          this.customerForm.house_info.status_rumah = 'terbooking_sementara';
+          this.closeCustomerModal();
+          this.showChoose = false;
+          this.validationForm = false
+        } catch (error) {
+          this.showErrorAlert('Gagal membooking rumah');
+          console.error('Error booking house:', error);
+        }
+      } else {
+        this.showAlert('Rumah Sudah dibooking, mohon cari rumah yang lain.', 'info');
+      }
+    },
+    async terbooking() {
+      this.loadHouseData(this.path_id, this.path_rumah.id_blok);
+      console.log(this.path_rumah._id);
+      if (this.path_rumah.status_rumah === 'deterjual' || this.path_rumah.status_rumah === 'deterjual' || this.path_rumah.status_rumah === 'terbooking_sementara') {
         try {
           const response = await custumerApi.updateHouseStatus(this.path_rumah._id, 'terbooking');
+          this.PostNotification('Ada Rumah Yang Terbooking')
           console.log(response)
           this.showSuccessAlert('Rumah berhasil dibooking');
           this.customerForm.house_info.status_rumah = 'terbooking';
@@ -450,17 +520,21 @@ export default {
         const id = path.getAttribute('id');
         if (id) {
           const house = this.houses.find((h) => h.id_rumah === id);
+          const customer = this.HouseandUser.find((house) => house.id_rumah.id_rumah === id);
 
+          // Periksa status rumah dan tambahkan kelas yang sesuai
           if (house && house.status_rumah === "deterjual") {
             path.classList.add('fill-green-500');
           } else if (house && house.status_rumah === "terbooking") {
-            path.classList.add('fill-gray-500');
-          } else if (house && house.status_rumah === "terjual") {
-            path.classList.add('fill-che');
-          } else if (house && house.status_rumah === "cash") {
-            path.classList.add('fill-maryjane');
-          } else if (house && house.status_rumah === "kpn") {
-            path.classList.add('fill-blue-600');
+            path.classList.add('fill-gray-700');
+          } else if (house && house.status_rumah === "terbooking_sementara") {
+            path.classList.add('fill-gray-300');
+          } else if (customer && house && house.status_rumah === "terjual") {
+            if (customer.type_pembayaran === "cash") {
+              path.classList.add('fill-che');
+            } else if (customer.type_pembayaran === "kpr") {
+              path.classList.add('fill-iceBlue');
+            }
           }
 
           path.classList.add(
@@ -471,58 +545,81 @@ export default {
             'duration-300',
             'ease-in-out'
           );
-
           path.addEventListener('mouseover', () => {
             this.handleMouseOver(path, id);
           });
-
           path.addEventListener('mouseout', () => {
             this.handleMouseOut(path);
           });
-
           path.addEventListener('click', () => {
             if (house && house.status_rumah === "deterjual") {
-              this.showChoose = true
+              this.showChoose = true;
               this.path_id = id;
               this.path_rumah = house;
-              console.log(this.path_id)
+            } else if (house && house.status_rumah === "terbooking_sementara") {
+              this.showChoose = true;
+              this.path_id = id;
+              this.path_rumah = house;
             } else if (house && house.status_rumah === "terbooking") {
-              this.showChoose = true
-              this.path_id = id;
-              this.path_rumah = house;
+              this.showAlert('Rumah Sudah Teerbooking', 'info');
             } else if (house && house.status_rumah === "terjual") {
-              this.showAlert('Rumah Sudah Terjual', 'info');
-            } else if (house && house.status_rumah === "cash") {
-              this.showAlert('Rumah Sudah Terjual Cash', 'info');
-            } else if (house && house.status_rumah === "kpr") {
-              this.showAlert('Rumah Sudah Terjual Kpr', 'info');
+              if (customer && customer.type_pembayaran === "cash") {
+                this.showAlert('Rumah Sudah Terjual Cash', 'info');
+              } else if (customer && customer.type_pembayaran === "kpr") {
+                this.showAlert('Rumah Sudah Terjual KPR', 'info');
+              } else {
+                this.showAlert('Rumah Sudah Terjual', 'info');
+              }
             }
-            //console.log(this.path_rumah)
-            // this.handleClick(id, house);
           });
         }
       });
-    },
+    }
+    ,
     handleMouseOver(path, id) {
       const house = this.houses.find(house => house.id_rumah === id);
-
+      //console.log(house)
+      //console.log(this.HouseandUser.id_rumah)
       if (house) {
         const blok = this.bloks.find(blok => blok._id === house.id_blok);
-        this.tooltipText = `Blok: ${blok ? blok.blokname : 'Tidak Ditemukan'}\n No Rumah: ${house.no_rumah}\n Type Rumah: ${house.type_rumah}`;
+        const users = this.HouseandUser.find(user => user.id_rumah.id_rumah === id)
+        console.log(users)
+        if (users) {
+          this.tooltipText = `
+        <div class="bg-white rounded text-black p-4 border-2 border-black text-center">
+           <p class="font-normal text-sm">Nama Marketing: <span class="font-normal">${users.id_user.username}</span></p>
+            <p class="font-normal text-sm">Type Rumah: <span class="font-normal">${house.type_rumah}</span></p>
+            <p class="font-normal text-sm">Blok: <span class="font-normal">${blok ? blok.blokname : 'Tidak Ditemukan'}</span></p>
+            <p class="font-normal text-sm">No Rumah: <span class="font-normal">${house.no_rumah}</span></p>
+            <p class="font-normal text-sm">Type Pembayaran: <span class="font-normal">${users.type_pembayaran
+            }</span></p>
+            <img src="/house.png" alt="House Image" class="w-40 h-40 rounded mb-2">
+        </div>
+    `;
+        } else {
+          this.tooltipText = `
+        <div class="bg-white rounded text-black p-4 border-2 border-black text-center">
+            <p class="font-normal text-sm">Type Rumah: <span class="font-normal">${house.type_rumah}</span></p>
+            <p class="font-normal text-sm">Blok: <span class="font-normal">${blok ? blok.blokname : 'Tidak Ditemukan'}</span></p>
+            <p class="font-normal text-sm">No Rumah: <span class="font-normal">${house.no_rumah}</span></p>
+            <img src="/house.png" alt="House Image" class="w-40 h-40 rounded mb-2">
+        </div>
+    `;
+        }
+
       } else {
-        this.tooltipText = `Informasi rumah tidak ditemukan \n ID:${id}`;
+        this.tooltipText = `<p class="font-normal text-che text-sm">Type Rumah: <span class="font-normal">Tidak Ditemukan!!!</span></p>`
       }
 
       const { top, left, width } = path.getBoundingClientRect();
       this.tooltipStyle = {
-        top: `${top - 40 + window.scrollY}px`,
-        left: `${left + width / 2 + window.scrollX}px`,
+        top: `${top - 100 + window.scrollY}px`,
+        left: `${left + width + 40 + window.scrollX}px`,
       };
 
       this.tooltipVisible = true;
       this.selectedId = id;
-    }
-    ,
+    },
     handleMouseOut(path) {
       path.classList.remove('stroke-yellow-500');
       this.tooltipVisible = false;
@@ -552,6 +649,7 @@ export default {
       });
     },
     handleClick(id, house) {
+
       this.selectedId = id;
       if (house && house.status_rumah === "deterjual") {
         this.customerForm.id_rumah = house._id;
@@ -568,15 +666,20 @@ export default {
         this.showAlert('Rumah Dalam KPR', 'info');
         this.closeModal();
       } else if (house && house.status_rumah === "terbooking") {
+        this.showAlert('Rumah sudah Terbooking', 'info');
+        this.closeModal();
+      } else if (house && house.status_rumah === "terbooking_semetara") {
         this.customerForm.id_rumah = house._id;
         this.customerForm.id_blok = house.id_blok;
         this.closeModal();
         this.loadHouseData(id, house.id_blok);
       }
+
     },
     openModal() {
       this.isModalVisible = true;
       this.form.id_rumah = this.selectedId;
+
     },
     closeModal() {
       this.isModalVisible = false;
@@ -606,8 +709,6 @@ export default {
       blokApi.getById(id_blok)
         .then((response) => {
           this.customerForm.blokname = response.data.data.blokname;
-          //this.isCustomerModalVisible = true;
-          //this.isModalVisible = false;
         })
         .catch((error) => {
           console.error("Error fetching blok data:", error);
@@ -648,6 +749,8 @@ export default {
             "Content-Type": "multipart/form-data"
           }
         });
+        this.terbooking();
+        this.PostNotification("Ada Data Customer Yang Harus Di Verifikasi")
         this.showSuccessAlert('Form berhasil dikirim!');
         this.closeCustomerModal();
       } catch (error) {
@@ -702,6 +805,16 @@ export default {
       this.path_id = null;
       this.path_rumah = null;
     },
+    fetchCustomers() {
+      houseApi.getHouseadnUser()
+        .then((response) => {
+          this.HouseandUser = response.data.data;
+        })
+        .catch((error) => {
+          console.error('Error fetching bloks:', error);
+        });
+
+    },
     fetchBloks() {
       blokApi.getAll()
         .then((response) => {
@@ -734,13 +847,13 @@ export default {
     initializePanZoom() {
       const svgElement = this.$refs.svgContainer.querySelector('svg');
 
-      svgElement.setAttribute('width', '1200px');  // Atur lebar sesuai kebutuhan
-      svgElement.setAttribute('height', '1200px'); // Atur tinggi sesuai kebutuhan
+      svgElement.setAttribute('width', '1200px');
+      svgElement.setAttribute('height', '1200px');
 
       if (svgElement) {
         this.panZoomInstance = svgPanZoom(svgElement, {
           zoomEnabled: true,
-          // controlIconsEnabled: true,
+          controlIconsEnabled: true,
           fit: true,
           center: true,
           minZoom: 0.5,

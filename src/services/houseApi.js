@@ -7,6 +7,9 @@ export default {
   getById(id) {
     return Api.get(`/house/${id}`);
   },
+  getByID(_id) {
+    return Api.get(`/house/id/${_id}`);
+  },
   create(data) {
     return Api.post("/house", data);
   },
@@ -18,5 +21,8 @@ export default {
   },
   getBlokandHouse() {
     return Api.get("/blocks-and-houses");
+  },
+  getHouseadnUser() {
+    return Api.get("/house/user");
   },
 };

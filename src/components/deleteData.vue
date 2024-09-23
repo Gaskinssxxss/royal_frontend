@@ -18,28 +18,36 @@
         </div>
 
         <div v-if="customers.length > 0">
-            <table class="min-w-full border-collapse border-2 border-black text-center">
+            <table class="min-w-full border-collapse border-2 border-black text-center text-sm">
                 <thead>
-                    <tr>
+                    <tr class="text-base">
+                        <th class="border-2 border-black px-2 py-2 font-normal">id</th>
                         <th class="border-2 border-black px-2 py-2 font-normal">Marketer</th>
                         <th class="border-2 border-black px-2 py-2 font-normal">Nama Lengkap Customer</th>
                         <th class="border-2 border-black px-2 py-2 font-normal">Nomor Hp Customer</th>
-                        <th class="border-2 border-black px-2 py-2 font-normal">Email Customer</th>
-                        <th class="border-2 border-black px-2 py-2 font-normal">Nama Blok</th>
-                        <th class="border-2 border-black px-2 py-2 font-normal">Nomor Rumah</th>
-                        <th class="border-2 border-black px-2 py-2 font-normal">Tipe Rumah</th>
+                        <th class="border-2 border-black px-1 py-2 font-normal">Type Pembayaran</th>
+                        <th class="border-2 border-black px-1 py-2 font-normal">Status Berkas</th>
                         <th class="border-2 border-black px-2 py-2 font-normal">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-for="customer in customers" :key="customer._id">
+                        <td class="px-1 py-2 border border-black text-sm text-start pl-4">
+                            ADR - 0{{ customer.kavling[0].type.replace('Type ', '') }} -
+                            {{ customer.id_blok.blokname }} - 0{{ customer.id_rumah.no_rumah }}
+                        </td>
                         <td class="border-2 border-black px-2 py-2">{{ customer.id_user.username }}</td>
                         <td class="border-2 border-black px-2 py-2">{{ customer.data_pribadi[0].namaLengkap }}</td>
                         <td class="border-2 border-black px-2 py-2">{{ customer.data_pribadi[0].no_kontak }}</td>
-                        <td class="border-2 border-black px-2 py-2">{{ customer.data_pribadi[0].email }}</td>
-                        <td class="border-2 border-black px-2 py-2">{{ customer.id_blok.blokname }}</td>
-                        <td class="border-2 border-black px-2 py-2">{{ customer.id_rumah.no_rumah }}</td>
-                        <td class="border-2 border-black px-2 py-2">{{ customer.id_rumah.type_rumah }}</td>
+                        <td class="border-2 border-black px-1 py-2">{{ customer.type_pembayaran }}</td>
+                        <div class="border-t border-black">
+                            <div v-if="customer.verifikasi_data === true">
+                                <td class="px-2 pt-5 text-marydeep">Terverifikasi</td>
+                            </div>
+                            <div v-if="customer.verifikasi_data === false">
+                                <td class="px-2 pt-5 text-che">Belum Terverifikasi</td>
+                            </div>
+                        </div>
                         <td class="border-2 border-black pl-2 pt-3 pb-2">
                             <div>
                                 <button @click="deleteCustomer(customer._id)" class="bg-black text-black rounded">

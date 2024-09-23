@@ -20,7 +20,7 @@ export default {
             this.notifications.push({ message });
             setTimeout(() => {
                 this.notifications.shift();
-            }, 10000);
+            }, 5000);
         }
     }
 };

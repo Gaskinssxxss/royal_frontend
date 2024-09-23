@@ -1,4 +1,33 @@
 <template>
+    <div class="text-2xl absolute right-6 top-4">
+        <div class="text-base tracking-wider space-y-2">
+            <div class="flex space-x-2">
+                <div class="bg-green-500 w-5 h-5 border border-black">
+                </div>
+                <h1>Available</h1>
+            </div>
+            <div class="flex space-x-2">
+                <div class="bg-che w-5 h-5 pt-3 border border-black">
+                </div>
+                <h1>Terjual Cash</h1>
+            </div>
+            <div class="flex space-x-2">
+                <div class="bg-iceBlue w-5 h-5 pt-3 border border-black">
+                </div>
+                <h1>Terjual Kpr</h1>
+            </div>
+            <div class="flex space-x-2">
+                <div class="bg-gray-700 w-5 h-5 pt-3 border border-black">
+                </div>
+                <h1>Terbookin</h1>
+            </div>
+            <div class="flex space-x-2">
+                <div class="bg-gray-300 w-5 h-5 pt-3 border border-black">
+                </div>
+                <h1>Terbookin Sementara</h1>
+            </div>
+        </div>
+    </div>
     <div>
         <div class="w-full h-screen overflow-auto">
             <div class="flex justify-center items-center -rotate-[30deg]">
@@ -8,12 +37,16 @@
         </div>
 
         <div ref="indicator"></div>
-        <div v-if="tooltipVisible" :style="tooltipStyle"
+
+        <div v-if="tooltipVisible" :style="tooltipStyle" class="absolute text-white text-sm p-2 rounded-lg z-20">
+            <div v-html="tooltipText"></div>
+        </div>
+
+        <!-- <div v-if="tooltipVisible" :style="tooltipStyle"
             class="absolute bg-gray-800 text-white text-sm p-2 rounded-lg shadow-lg z-20">
             {{ tooltipText }}
-        </div>
+        </div> -->
     </div>
-
 </template>
 
 
@@ -37,12 +70,14 @@ export default {
             path_rumah: [],
             bloks: [],
             houses: [],
+            HouseandUser: []
         };
     },
     mounted() {
         this.loadSvg();
         this.fetchBloks();
         this.fetchHouses();
+        this.fetchCustomers();
     },
     methods: {
         async loadSvg() {
@@ -69,25 +104,34 @@ export default {
                     console.error('Error fetching houses:', error);
                 });
         },
+        fetchCustomers() {
+            houseApi.getHouseadnUser()
+                .then((response) => {
+                    this.HouseandUser = response.data.data;
+                })
+                .catch((error) => {
+                    console.error('Error fetching bloks:', error);
+                });
+
+        },
         addSvgEventListeners() {
             const paths = this.$refs.svgContainer.querySelectorAll('path');
             paths.forEach((path) => {
                 const id = path.getAttribute('id');
                 if (id) {
                     const house = this.houses.find((h) => h.id_rumah === id);
-
+                    const customer = this.HouseandUser.find((house) => house.id_rumah.id_rumah === id);
                     if (house && house.status_rumah === "deterjual") {
                         path.classList.add('fill-green-500');
                     } else if (house && house.status_rumah === "terbooking") {
-                        path.classList.add('fill-gray-500');
-                    } else if (house && house.status_rumah === "terjual") {
+                        path.classList.add('fill-gray-700');
+                    } else if (customer && house && house.status_rumah === "terjual" && customer.type_pembayaran === "cash") {
                         path.classList.add('fill-che');
-                    } else if (house && house.status_rumah === "cash") {
-                        path.classList.add('fill-maryjane');
-                    } else if (house && house.status_rumah === "kpn") {
-                        path.classList.add('fill-blue-600');
+                    } else if (house && house.status_rumah === "terbooking_sementara") {
+                        path.classList.add('fill-gray-300');
+                    } else if (customer && house && house.status_rumah === "terjual" && customer.type_pembayaran === "kpr") {
+                        path.classList.add('fill-iceBlue');
                     }
-
                     path.classList.add(
                         'cursor-pointer',
                         'stroke-black',
@@ -109,24 +153,48 @@ export default {
         },
         handleMouseOver(path, id) {
             const house = this.houses.find(house => house.id_rumah === id);
-
+            //console.log(house)
+            //console.log(this.HouseandUser.id_rumah)
             if (house) {
                 const blok = this.bloks.find(blok => blok._id === house.id_blok);
-                this.tooltipText = `Blok: ${blok ? blok.blokname : 'Tidak Ditemukan'}\n No Rumah: ${house.no_rumah}\n Type Rumah: ${house.type_rumah}`;
+                const users = this.HouseandUser.find(user => user.id_rumah.id_rumah === id)
+
+                if (users) {
+                    this.tooltipText = `
+        <div class="bg-white rounded text-black p-4 border-2 border-black text-center">
+           <p class="font-normal text-sm">Nama Marketing: <span class="font-normal">${users.id_user.username}</span></p>
+            <p class="font-normal text-sm">Type Rumah: <span class="font-normal">${house.type_rumah}</span></p>
+            <p class="font-normal text-sm">Blok: <span class="font-normal">${blok ? blok.blokname : 'Tidak Ditemukan'}</span></p>
+            <p class="font-normal text-sm">No Rumah: <span class="font-normal">${house.no_rumah}</span></p>
+            <p class="font-normal text-sm">Type Pembayaran: <span class="font-normal">${users.type_pembayaran
+                        }</span></p>
+            <img src="/house.png" alt="House Image" class="w-40 h-40 rounded mb-2">
+        </div>
+    `;
+                } else {
+                    this.tooltipText = `
+        <div class="bg-white rounded text-black p-4 border-2 border-black text-center">
+            <p class="font-normal text-sm">Type Rumah: <span class="font-normal">${house.type_rumah}</span></p>
+            <p class="font-normal text-sm">Blok: <span class="font-normal">${blok ? blok.blokname : 'Tidak Ditemukan'}</span></p>
+            <p class="font-normal text-sm">No Rumah: <span class="font-normal">${house.no_rumah}</span></p>
+            <img src="/house.png" alt="House Image" class="w-40 h-40 rounded mb-2">
+        </div>
+    `;
+                }
+
             } else {
-                this.tooltipText = `Informasi rumah tidak ditemukan \n ID:${id}`;
+                this.tooltipText = `<p class="font-normal text-che text-sm">Type Rumah: <span class="font-normal">Tidak Ditemukan!!!</span></p>`
             }
 
             const { top, left, width } = path.getBoundingClientRect();
             this.tooltipStyle = {
-                top: `${top - 40 + window.scrollY}px`,
-                left: `${left + width / 2 + window.scrollX}px`,
+                top: `${top - 100 + window.scrollY}px`,
+                left: `${left + width + 40 + window.scrollX}px`,
             };
 
             this.tooltipVisible = true;
             this.selectedId = id;
-        }
-        ,
+        },
         handleMouseOut(path) {
             path.classList.remove('stroke-yellow-500');
             this.tooltipVisible = false;
@@ -153,13 +221,13 @@ export default {
         initializePanZoom() {
             const svgElement = this.$refs.svgContainer.querySelector('svg');
 
-            svgElement.setAttribute('width', '1200px');  // Atur lebar sesuai kebutuhan
-            svgElement.setAttribute('height', '1200px'); // Atur tinggi sesuai kebutuhan
+            svgElement.setAttribute('width', '1200px');
+            svgElement.setAttribute('height', '1200px');
 
             if (svgElement) {
                 this.panZoomInstance = svgPanZoom(svgElement, {
                     zoomEnabled: true,
-                    // controlIconsEnabled: true,
+                    controlIconsEnabled: true,
                     fit: true,
                     center: true,
                     minZoom: 0.5,

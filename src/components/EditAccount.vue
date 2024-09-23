@@ -48,14 +48,24 @@
 
                             <div class="mb-4">
                                 <label class="block text-gray-700">New Password</label>
-                                <input v-model="form.password" class="w-full px-4 py-2 border rounded" type="password"
+                                <input v-model="form.password" class="w-full px-4 py-2 border rounded" type="text"
                                     required />
                             </div>
 
                             <div class="mb-4">
                                 <label class="block text-gray-700">Confirm New Password</label>
                                 <input v-model="form.confirmPassword" class="w-full px-4 py-2 border rounded"
-                                    type="password" required />
+                                    type="text" required />
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="block text-gray-700">Role</label>
+                                <select class="w-full px-4 py-2 border rounded" v-model="form.role">
+                                    <option value="marketing">marketing</option>
+                                    <option value="keuangan">Finance</option>
+                                    <option value="admin">admin</option>
+                                    <option value="direktur">direktur</option>
+                                </select>
                             </div>
 
                             <div class="flex justify-end">
@@ -88,6 +98,7 @@ export default {
                 username: "",
                 password: "",
                 confirmPassword: "",
+                role: ""
             },
         };
     },
@@ -131,6 +142,7 @@ export default {
             this.form.id = user._id;
             this.form.username = user.username;
             this.form.password = "";
+            this.form.role = "";
             this.form.confirmPassword = "";
             this.isModalOpen = true;
         },
@@ -142,10 +154,12 @@ export default {
                 this.showErrorAlert("Passwords do not match!");
                 return;
             }
+
             try {
                 await Api.put(`/users/${this.form.id}`, {
                     username: this.form.username,
                     password: this.form.password,
+                    role: this.form.role,
                 });
                 this.showSuccessAlert("User updated successfully");
                 this.closeModal();
@@ -157,4 +171,3 @@ export default {
     },
 };
 </script>
-<style scoped></style>

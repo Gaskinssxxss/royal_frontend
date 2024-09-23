@@ -1,30 +1,30 @@
 <template>
-    <div>
+    <div class="p-4">
         <div v-if="userHistory.length > 0" class="mb-6">
             <div class="overflow-y-auto h-screen">
-                <table class="table-auto w-full font-anton bg-white">
-                    <thead>
+                <table class="table-auto w-full font-anton bg-white text-sm">
+                    <thead class="text-base">
                         <tr class="bg-gray-200 text-left">
-                            <th class="px-4 py-2 border border-black font-normal">Nama Customer</th>
-                            <th class="px-4 py-2 border border-black font-normal">Blok</th>
-                            <th class="px-4 py-2 border border-black font-normal">No Rumah</th>
-                            <th class="px-4 py-2 border border-black font-normal">No Kavling</th>
-                            <th class="px-4 py-2 border border-black font-normal">Type Kavling</th>
-                            <th class="px-4 py-2 border border-black font-normal">Luas Bangunan</th>
-                            <th class="px-4 py-2 border border-black font-normal">Luas Tanah</th>
-                            <th class="px-4 py-2 border border-black font-normal">Status Rumah</th>
-                            <th class="px-4 py-2 border border-black font-normal">Status Dokumen</th>
-                            <th class="px-4 py-2 border border-black font-normal">Aksi</th>
+                            <th class="px-4 py-2 border border-black font-normal text-lg">Id</th>
+                            <th class="px-4 py-2 border border-black font-normal text-lg">Nama Customer</th>
+                            <th class="px-4 py-2 border border-black font-normal text-lg">No Kavling</th>
+                            <th class="px-4 py-2 border border-black font-normal text-lg">Luas Bangunan</th>
+                            <th class="px-4 py-2 border border-black font-normal text-lg">Luas Tanah</th>
+                            <th class="px-4 py-2 border border-black font-normal text-lg">Status Rumah</th>
+                            <th class="px-4 py-2 border border-black font-normal text-lg">Status Dokumen</th>
+                            <th class="px-4 py-2 border border-black font-normal text-lg">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr v-for="customer in userHistory" :key="customer._id" class="border-b">
-                            <td class="px-4 py-2 border border-black">{{ customer.data_pribadi.nama_lengkap }}</td>
-                            <td class="px-4 py-2 border border-black">{{ customer.id_blok.blokname }}</td>
-                            <td class="px-4 py-2 border border-black">{{ customer.id_rumah.no_rumah }}</td>
+                            <td class="px-4 py-2 border border-black">
+                                ADR - 0{{ customer.kavling[0].type.replace('Type ', '') }} -
+                                {{ customer.id_blok.blokname }} - 0{{ customer.id_rumah.no_rumah }}
+                            </td>
+                            <td class="px-4 py-2 border border-black">{{ customer.id_user.username }}</td>
                             <td class="px-4 py-2 border border-black">{{ customer.kavling[0].no_kavling }}</td>
-                            <td class="px-4 py-2 border border-black">{{ customer.kavling[0].type }}</td>
-                            <td class="px-4 py-2 border border-black">{{ customer.kavling[0].luas_bangunan }}</td>
+                            <td class="px-4 py-2 border border-black">{{ customer.kavling[0].luas_bangunan }}
+                            </td>
                             <td class="px-4 py-2 border border-black">{{ customer.kavling[0].luas_tanah }}</td>
                             <td class="px-4 py-2 border border-black">{{ customer.id_rumah.status_rumah }}</td>
                             <td class="px-4 py-2 border border-black">
@@ -63,8 +63,7 @@ export default {
     methods: {
         async tanyaAdmin(customer) {
             this.selectedCustomer = customer;
-            const message = `Marketing : ${customer.id_user.username} - Blok : ${customer.id_blok.blokname} - 
-      No Rumah : ${customer.id_rumah.no_rumah} - Tipe : ${customer.id_rumah.type_rumah}`;
+            const message = `${customer.id_user.username} - ADR - 0${customer.kavling[0].type.replace('Type ', '')} - ${customer.id_blok.blokname} - 0${customer.id_rumah.no_rumah}`;
             const encodedMessage = btoa(message);
             await this.$router.push({ path: '/live-chat', query: { message: encodedMessage } });
         },

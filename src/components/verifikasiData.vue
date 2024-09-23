@@ -18,42 +18,43 @@
             </div>
         </div>
         <div v-if="customer.length > 0">
-            <div class="text-lg">
-                <table class="min-w-full border-collapse border-2 border-black text-center">
-                    <thead>
+            <div>
+                <table class="min-w-full border-collapse border-2 border-black text-center text-sm">
+                    <thead class="text-base">
                         <tr>
+                            <th class="px-4 py-2 border border-black font-normal text-lg">Id</th>
                             <th class="border-2 border-black px-2 py-2 font-normal">Marketer</th>
-                            <th class="border-2 border-black px-2 py-2 font-normal">Nama Lengkap</th>
-                            <th class="border-2 border-black px-2 py-2 font-normal">Nomor Hp</th>
-                            <th class="border-2 border-black px-2 py-2 font-normal">Email</th>
-                            <th class="border-2 border-black px-2 py-2 font-normal">Nama Blok</th>
-                            <th class="border-2 border-black px-2 py-2 font-normal">Nomor Rumah</th>
-                            <th class="border-2 border-black px-2 py-2 font-normal">Tipe Rumah</th>
-                            <th class="border-2 border-black px-2 py-2 font-normal">Status</th>
-                            <th class="border-2 border-black px-2 py-2 font-normal">Aksi</th>
+                            <th class="border-2 border-black px-1 py-2 font-normal">Nama Lengkap</th>
+                            <th class="border-2 border-black px-1 py-2 font-normal">Nomor Hp</th>
+                            <th class="border-2 border-black px-1 py-2 font-normal">Tipe Pembayaran</th>
+                            <th class="border-2 border-black px-1 py-2 font-normal">Status Berkas</th>
+                            <th class="border-2 border-black px-1 py-2 font-normal">Aksi</th>
                         </tr>
                     </thead>
                     <tbody v-for="custom in customer" :key="custom._id">
                         <tr>
+                            <td class="px-1 py-2 border border-black text-sm">
+                                ADR - 0{{ custom.kavling[0].type.replace('Type ', '') }} -
+                                {{ custom.id_blok.blokname }} - 0{{ custom.id_rumah.no_rumah }}
+                            </td>
                             <td class="border-2 border-black px-2 py-2">{{ custom.id_user.username }}</td>
-                            <td class="border-2 border-black px-2 py-2">{{ custom.data_pribadi[0].namaLengkap }}</td>
-                            <td class="border-2 border-black px-2 py-2">{{ custom.data_pribadi[0].no_kontak }}</td>
-                            <td class="border-2 border-black px-2 py-2">{{ custom.data_pribadi[0].email }}</td>
-                            <td class="border-2 border-black px-2 py-2">{{ custom.id_blok.blokname }}</td>
-                            <td class="border-2 border-black px-2 py-2">{{ custom.id_rumah.no_rumah }}</td>
-                            <td class="border-2 border-black px-2 py-2">{{ custom.id_rumah.type_rumah }}</td>
-                            <div v-if="custom.verifikasi_data === true">
-                                <td class="px-2 pt-4 text-marydeep">Terverifikasi</td>
-                            </div>
-                            <div v-if="custom.verifikasi_data === false">
-                                <td class="px-2 pt-4 text-che">Belum diverifikasi</td>
+                            <td class="border-2 border-black px-1 py-2">{{ custom.data_pribadi[0].namaLengkap }}</td>
+                            <td class="border-2 border-black px-1 py-2">{{ custom.data_pribadi[0].no_kontak }}</td>
+                            <td class="border-2 border-black px-1 py-2">{{ custom.type_pembayaran }}</td>
+                            <div class="border-t border-black">
+                                <div v-if="custom.verifikasi_data === true">
+                                    <td class="px-1 pt-4 text-marydeep">Terverifikasi</td>
+                                </div>
+                                <div v-if="custom.verifikasi_data === false">
+                                    <td class="px-1 pt-4 text-che">Belum diverifikasi</td>
+                                </div>
                             </div>
                             <td class="border-2 border-black pl-2 pt-3 pb-2">
-                                <div @click="openModal(custom._id, 1)">
-                                    <button class="bg-black text-black">
+                                <div @click="openModal(custom._id, 1, custom.id_user._id)">
+                                    <button class="bg-black text-black rounded-md">
                                         <h1
-                                            class="bg-gray-200 border-2 px-4 py-2 border-black uppercase transition-transform duration-300 ease-linear transform -translate-x-1 -translate-y-1 hover:-translate-x-2 hover:-translate-y-2">
-                                            Data Lengkap
+                                            class="bg-gray-200 rounded-md border-2 px-4 py-2 border-black uppercase transition-transform duration-300 ease-linear transform -translate-x-1 -translate-y-1 hover:-translate-x-2 hover:-translate-y-2">
+                                            Data
                                         </h1>
                                     </button>
                                 </div>
@@ -303,6 +304,7 @@
 import custumerApi from '@/services/custumerApi';
 import VueEasyLightbox from 'vue-easy-lightbox';
 import Swal from 'sweetalert2';
+import ApiNotification from "../services/Notifitcation"
 export default {
     components: {
         VueEasyLightbox
@@ -367,6 +369,7 @@ export default {
             ],
             showData: false,
             selectedId: '',
+            selectedIdUser: '',
             modalPage: 1,
             lightboxVisible: false,
             lightboxImages: [],
@@ -376,6 +379,46 @@ export default {
         this.getUnverifiedCustomers();
     },
     methods: {
+        async PostNotification(message, UserID) {
+            try {
+                const data = {
+                    content: message,
+                    user: this.$store.state.user._id,
+                    related_user: UserID,
+                    role_receivers: ["marketing"]
+                };
+                const result = await ApiNotification.create(data);
+                console.log(result)
+            } catch (error) {
+                console.log(error)
+            }
+        },
+        async NotificationToKeuangan(message) {
+            try {
+                const data = {
+                    content: message,
+                    user: this.$store.state.user._id,
+                    role_receivers: ["keuangan"]
+                };
+                const result = await ApiNotification.create(data);
+                console.log(result)
+            } catch (error) {
+                console.log(error)
+            }
+        },
+        async NotificationToDirektur(message) {
+            try {
+                const data = {
+                    content: message,
+                    user: this.$store.state.user._id,
+                    role_receivers: ["direktur"]
+                };
+                const result = await ApiNotification.create(data);
+                console.log(result)
+            } catch (error) {
+                console.log(error)
+            }
+        },
         showAlert(message, type = 'info') {
             Swal.fire({
                 title: 'Information',
@@ -400,9 +443,10 @@ export default {
                 confirmButtonText: 'Ok!',
             });
         },
-        openModal(id, page) {
+        openModal(id, page, idUser) {
             this.selectedId = id;
             this.modalPage = page;
+            this.selectedIdUser = idUser
             this.showData = true;
         },
         closeModal() {
@@ -421,6 +465,8 @@ export default {
                 });
         },
         verifyCustomer(id) {
+            this.NotificationToKeuangan("Data Customer Telah Dilakukan Verifikasi");
+            this.PostNotification("Data Customer Telah Dilakukan Verifikasi", this.selectedIdUser);
             custumerApi.updateVerificationStatus(id)
                 .then(() => {
                     this.showSuccessAlert('Verifikasi berhasil');

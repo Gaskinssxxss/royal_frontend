@@ -9,11 +9,22 @@ import store from "@/services/store";
 import LiveChat from "@/views/LiveChat.vue";
 import KeunganDashboard from "@/views/KeunganDashboard.vue";
 import marketingDashboard from "@/views/marketingDashboard.vue";
+import direkturDashboard from "@/views/direkturDashboard.vue";
 
 const routes = [
   {
     path: "/",
     redirect: { name: "Login" },
+  },
+  {
+    path: "/direktur",
+    name: "direkturDashboard",
+    component: direkturDashboard,
+    meta: {
+      title: "Direktur Dashboard",
+      authRequired: true,
+      role: "direktur",
+    },
   },
   {
     path: "/marketing",
@@ -92,10 +103,8 @@ router.beforeEach(async (to, from, next) => {
   if (!store.state.isStoreUpdated) {
     await store.dispatch("updateStore");
   }
-
   const isAuthenticated = store.state.userLoggedIn;
   const userRole = store.state.userRole;
-
   if (isAuthenticated && (to.name === "Login" || to.name === "Register")) {
     if (userRole === "admin") {
       next({ name: "Admin Dashboard" });
@@ -103,6 +112,8 @@ router.beforeEach(async (to, from, next) => {
       next({ name: "Marketing" });
     } else if (userRole === "keuangan") {
       next({ name: "KeuanganDashboard" });
+    } else if (userRole === "direktur") {
+      next({ name: "direkturDashboard" });
     } else {
       next({ name: "Unauthorized" });
     }
@@ -113,30 +124,11 @@ router.beforeEach(async (to, from, next) => {
     to.meta.role &&
     to.meta.role !== userRole
   ) {
+    next({ name: "Unauthorized" });
   } else {
     next();
   }
 });
-
-// router.beforeEach(async (to, from, next) => {
-//   if (!store.state.isStoreUpdated) {
-//     await store.dispatch("updateStore");
-//   }
-
-//   const isAuthenticated = store.state.userLoggedIn;
-//   const userRole = store.state.userRole;
-//   if (to.meta.authRequired && !isAuthenticated) {
-//     next({ name: "Login" });
-//   } else if (
-//     to.meta.authRequired &&
-//     to.meta.role &&
-//     to.meta.role !== userRole
-//   ) {
-//     next({ name: "Unauthorized" });
-//   } else {
-//     next();
-//   }
-// });
 
 router.afterEach((to) => {
   document.title = to.meta.title;

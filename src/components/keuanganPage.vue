@@ -3,6 +3,7 @@
         <div class="mb-4 flex space-x-4">
             <select v-model="selectedBlokname" class="border-2 border-black px-4 py-2 flex-grow">
                 <option disabled value="">Pilih Blok</option>
+                <option value="semua">semua</option>
                 <option v-for="blok in blokOptions" :key="blok._id.$oid" :value="blok.blokname"
                     class="font-bold font-Jet capitalize tracking-wide">
                     {{ blok.blokname }}
@@ -15,36 +16,39 @@
                 </button>
             </div>
         </div>
+
         <div v-if="customer.length > 0">
-            <div class="text-lg">
+            <div class="text-sm">
                 <table class="min-w-full border-collapse border-2 border-black text-center">
                     <thead>
-                        <tr>
+                        <tr class="text-base">
+                            <th class="border-2 border-black px-2 py-2 font-normal">Id</th>
                             <th class="border-2 border-black px-2 py-2 font-normal">Marketer</th>
                             <th class="border-2 border-black px-2 py-2 font-normal">Nama Lengkap</th>
                             <th class="border-2 border-black px-2 py-2 font-normal">Nomor Hp</th>
-                            <th class="border-2 border-black px-2 py-2 font-normal">Email</th>
-                            <th class="border-2 border-black px-2 py-2 font-normal">Nama Blok</th>
-                            <th class="border-2 border-black px-2 py-2 font-normal">Nomor Rumah</th>
-                            <th class="border-2 border-black px-2 py-2 font-normal">Tipe Rumah</th>
                             <th class="border-2 border-black px-2 py-2 font-normal">Tipe Pembayaran</th>
-                            <th class="border-2 border-black px-2 py-2 font-normal">Data Terverikasi</th>
+                            <th class="border-2 border-black px-2 py-2 font-normal">Status Berkas</th>
                             <th class="border-2 border-black px-2 py-2 font-normal">Aksi</th>
                         </tr>
                     </thead>
                     <tbody v-for="custom in customer" :key="custom._id">
                         <tr v-if="custom.status_pembayaran === true">
+                            <td class="px-1 py-2 border border-black text-sm">
+                                ADR - 0{{ custom.kavling[0].type.replace('Type ', '') }} -
+                                {{ custom.id_blok.blokname }} - 0{{ custom.id_rumah.no_rumah }}
+                            </td>
                             <td class="border-2 border-black px-2 py-2">{{ custom.id_user.username }}</td>
                             <td class="border-2 border-black px-2 py-2">{{ custom.data_pribadi[0].namaLengkap }}</td>
                             <td class="border-2 border-black px-2 py-2">{{ custom.data_pribadi[0].no_kontak }}</td>
-                            <td class="border-2 border-black px-2 py-2">{{ custom.data_pribadi[0].email }}</td>
-                            <td class="border-2 border-black px-2 py-2">{{ custom.id_blok.blokname }}</td>
-                            <td class="border-2 border-black px-2 py-2">{{ custom.id_rumah.no_rumah }}</td>
-                            <td class="border-2 border-black px-2 py-2">{{ custom.id_rumah.type_rumah }}</td>
                             <td class="border-2 border-black px-2 py-2">{{ custom.type_pembayaran }}</td>
-                            <td class="border-2 border-black px-2 py-2">
-                                {{ custom.verifikasi_data ? 'Terverifikasi' : 'Belum Terverifikasi' }}
-                            </td>
+                            <div class="border-t border-black">
+                                <div v-if="custom.verifikasi_data === true">
+                                    <td class="px-1 pt-4 text-marydeep">Terverifikasi</td>
+                                </div>
+                                <div v-if="custom.verifikasi_data === false">
+                                    <td class="px-1 pt-4 text-che">Belum diverifikasi</td>
+                                </div>
+                            </div>
                             <td class="border-2 border-black pl-2 pt-3 pb-2">
                                 <div v-if="keuanganStatus[custom._id] === true">
                                     <button @click="shows" class="bg-black text-black">
@@ -77,7 +81,7 @@
             <div class="bg-white p-6 rounded-lg w-1/2">
                 <h2 class="text-xl font-bold mb-4">Input Data Pembayaran</h2>
                 <div class="mb-4">
-                    <h12 class="block mb-2">Harga Pokok Rumah:</h12>
+                    <h12 class="block mb-2">Total Harga Rumah:</h12>
                     <h1 class="border border-gray-300 p-2 w-full">
                         {{ formatRupiah(total) }}
                     </h1>
@@ -106,7 +110,6 @@
 import custumerApi from '@/services/custumerApi';
 import keuanganApi from '@/services/keuangan';
 import Swal from 'sweetalert2';
-
 export default {
     data() {
         return {
@@ -115,7 +118,58 @@ export default {
             selectedBlokname: '',
             isverified: false,
             blokOptions: [
-                // your blokOptions data here
+                { "_id": { "$oid": "66dc1aa8dc6375e185b9ff0d" }, "blokname": "TERATAI" },
+                { "_id": { "$oid": "66dc1ab1dc6375e185b9ff10" }, "blokname": "LAVENDER" },
+                { "_id": { "$oid": "66dc1ab3dc6375e185b9ff13" }, "blokname": "ANYELIR" },
+                { "_id": { "$oid": "66dc1ab9dc6375e185b9ff16" }, "blokname": "KAMBOJA" },
+                { "_id": { "$oid": "66dc1abcdc6375e185b9ff19" }, "blokname": "CAMELIA" },
+                { "_id": { "$oid": "66dc1ac2dc6375e185b9ff1c" }, "blokname": "LILY" },
+                { "_id": { "$oid": "66dc1acadc6375e185b9ff1f" }, "blokname": "BOUGENVILLE" },
+                { "_id": { "$oid": "66dc1acddc6375e185b9ff22" }, "blokname": "MATAHARI" },
+                { "_id": { "$oid": "66dc1ad3dc6375e185b9ff26" }, "blokname": "MATAHARI-A" },
+                { "_id": { "$oid": "66dc1ad7dc6375e185b9ff29" }, "blokname": "MATAHARI-B" },
+                { "_id": { "$oid": "66dc1adbdc6375e185b9ff2c" }, "blokname": "MATAHARI-C" },
+                { "_id": { "$oid": "66dc1ae1dc6375e185b9ff2f" }, "blokname": "MATAHARI-D" },
+                { "_id": { "$oid": "66dc1ae8dc6375e185b9ff32" }, "blokname": "TULIP" },
+                { "_id": { "$oid": "66dc1aeedc6375e185b9ff35" }, "blokname": "BROMELIA" },
+                { "_id": { "$oid": "66dc1af3dc6375e185b9ff38" }, "blokname": "BROMELIA-A" },
+                { "_id": { "$oid": "66dc1afadc6375e185b9ff3b" }, "blokname": "BROMELIA-B" },
+                { "_id": { "$oid": "66dc1b00dc6375e185b9ff3e" }, "blokname": "BROMELIA-C" },
+                { "_id": { "$oid": "66dc1b03dc6375e185b9ff41" }, "blokname": "BROMELIA-D" },
+                { "_id": { "$oid": "66dc1b13dc6375e185b9ff44" }, "blokname": "ALLYSUM" },
+                { "_id": { "$oid": "66dc1b14dc6375e185b9ff47" }, "blokname": "ALLYSUM-A" },
+                { "_id": { "$oid": "66dc1b16dc6375e185b9ff4a" }, "blokname": "ALLYSUM-B" },
+                { "_id": { "$oid": "66dc1b17dc6375e185b9ff4d" }, "blokname": "ALLYSUM-C" },
+                { "_id": { "$oid": "66dc1b2bdc6375e185b9ff50" }, "blokname": "SERUNI" },
+                { "_id": { "$oid": "66dc1b41dc6375e185b9ff53" }, "blokname": "KENANGA" },
+                { "_id": { "$oid": "66dc1b73dc6375e185b9ff59" }, "blokname": "AZALEA" },
+                { "_id": { "$oid": "66dc1b77dc6375e185b9ff5c" }, "blokname": "FLAMBOYAN" },
+                { "_id": { "$oid": "66dc1b7bdc6375e185b9ff5f" }, "blokname": "DAHLIA" },
+                { "_id": { "$oid": "66dc1b7edc6375e185b9ff62" }, "blokname": "GARDENIA" },
+                { "_id": { "$oid": "66dc1b83dc6375e185b9ff65" }, "blokname": "ALAMANDA" },
+                { "_id": { "$oid": "66dc1b85dc6375e185b9ff68" }, "blokname": "CEMPAKA" },
+                { "_id": { "$oid": "66dc1b88dc6375e185b9ff6b" }, "blokname": "MELATI" },
+                { "_id": { "$oid": "66dc1b93dc6375e185b9ff6e" }, "blokname": "ANGGREK" },
+                { "_id": { "$oid": "66dc1b94dc6375e185b9ff71" }, "blokname": "ANGGREK-A" },
+                { "_id": { "$oid": "66dc1b96dc6375e185b9ff74" }, "blokname": "ANGGREK-B" },
+                { "_id": { "$oid": "66dc1b97dc6375e185b9ff77" }, "blokname": "ANGGREK-C" },
+                { "_id": { "$oid": "66dc1b99dc6375e185b9ff7a" }, "blokname": "ANGGREK-D" },
+                { "_id": { "$oid": "66dc1ba3dc6375e185b9ff7d" }, "blokname": "ASOKA" },
+                { "_id": { "$oid": "66dc1ba4dc6375e185b9ff80" }, "blokname": "ASOKA-A" },
+                { "_id": { "$oid": "66dc1ba5dc6375e185b9ff83" }, "blokname": "ASOKA-B" },
+                { "_id": { "$oid": "66dc1ba7dc6375e185b9ff86" }, "blokname": "ASOKA-C" },
+                { "_id": { "$oid": "66dc1ba8dc6375e185b9ff89" }, "blokname": "ASOKA-D" },
+                { "_id": { "$oid": "66dc1baadc6375e185b9ff8c" }, "blokname": "ASOKA-E" },
+                { "_id": { "$oid": "66dc1baddc6375e185b9ff8f" }, "blokname": "ASOKA-F" },
+                { "_id": { "$oid": "66dc1bb0dc6375e185b9ff92" }, "blokname": "ASOKA-G" },
+                { "_id": { "$oid": "66dc1bb2dc6375e185b9ff95" }, "blokname": "ASOKA-H" },
+                { "_id": { "$oid": "66dc1bc4dc6375e185b9ff98" }, "blokname": "AMARYLIS" },
+                { "_id": { "$oid": "66dc1bd6dc6375e185b9ff9b" }, "blokname": "ADHYAKSA UTAMA" },
+                { "_id": { "$oid": "66dc1be4dc6375e185b9ff9e" }, "blokname": "EDELWEISS" },
+                { "_id": { "$oid": "66dc1be5dc6375e185b9ffa1" }, "blokname": "EDELWEISS-A" },
+                { "_id": { "$oid": "66dc1be7dc6375e185b9ffa4" }, "blokname": "EDELWEISS-B" },
+                { "_id": { "$oid": "66dc1be9dc6375e185b9ffa7" }, "blokname": "EDELWEISS-C" },
+                { "_id": { "$oid": "66dc1beadc6375e185b9ffaa" }, "blokname": "EDELWEISS-D" }
             ],
             showModal: false,
             newData: [],
@@ -123,12 +177,12 @@ export default {
             total: 0,
             dp: 0,
             total_akhir: 0,
-            keuanganStatus: {}, // new object to store status_dp of each customer
+            keuanganStatus: {},
         }
     },
     mounted() {
         this.getCustomer();
-        this.getKeuanganStatusDp(); // fetch keuangan status_dp on mount
+        this.getKeuanganStatusDp();
     },
     computed: {
         formattedDp: {
@@ -168,7 +222,7 @@ export default {
             keuanganApi.getKeuanganCustumerById(id)
                 .then((res) => {
                     this.newData = res.data[0].perhitungan_harga_rumah[0];
-                    this.total = (this.newData.harga_rumah + this.newData.kelebihan_tanah + this.newData.harga_lokasi + this.newData.biaya_proses) - this.newData.discount
+                    this.total = ((this.newData.harga_rumah + this.newData.kelebihan_tanah + this.newData.harga_lokasi + this.newData.biaya_proses) - this.newData.discount) - this.newData.total_acc_bank
                 })
                 .catch((error) => {
                     console.log(error)
@@ -209,6 +263,11 @@ export default {
         },
         searchCustomer() {
             this.customer = [];
+            if (this.selectedBlokname == 'semua') {
+                this.getCustomer();
+                return;
+            }
+
             if (this.selectedBlokname.length > 0) {
                 custumerApi.searchCustomerByBlokname(this.selectedBlokname)
                     .then(res => {
@@ -248,6 +307,19 @@ export default {
             this.customers = null;
             this.isverified = false;
         },
+        async NotificationToDirektur(message) {
+            try {
+                const data = {
+                    content: message,
+                    user: this.$store.state.user._id,
+                    role_receivers: ["direktur"]
+                };
+                const result = await keuanganApi.create(data);
+                console.log(result)
+            } catch (error) {
+                console.log(error)
+            }
+        },
         submitKeuangan() {
             const data = {
                 status_dp: true,
@@ -257,8 +329,9 @@ export default {
                     dp: this.dp
                 }]
             };
-            keuanganApi.update(this.customers[0]._id, data)
+            keuanganApi.updatePembayaran(this.customers[0]._id, data)
                 .then(() => {
+                    this.NotificationToDirektur("Ada Yang Membayar DP")
                     this.showSuccessAlert('Data Permbayaran berhasil disimpan');
                     this.closeModal();
                 })
@@ -274,6 +347,8 @@ export default {
                 minimumFractionDigits: 0,
             }).format(angka);
         },
+
+
     },
 };
 </script>

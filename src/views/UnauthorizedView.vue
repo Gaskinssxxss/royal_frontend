@@ -9,12 +9,19 @@
 </template>
 
 <script>
+import api from '../services/api'
 export default {
     name: "UnauthoriZed",
     methods: {
-        goBack() {
-            this.$router.back();
+        async goBack() {
+            const res = await api.post("/users/logout").catch((err) => {
+                throw new Error(err);
+            });
+            console.log(res)
+            this.$router.push('/login');
         }
+
     }
 }
+
 </script>
